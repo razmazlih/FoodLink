@@ -1,0 +1,53 @@
+.edit-restaurant-info-container {
+    padding: 20px;
+    margin: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+}
+
+.edit-restaurant-info-title {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.edit-restaurant-info-input {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.edit-restaurant-info-save-button,
+.edit-restaurant-info-edit-button {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.edit-restaurant-info-save-button:hover {
+    background-color: #218838;
+}
+
+.edit-restaurant-info-edit-button:hover {
+    background-color: #218838;
+}
+
+.edit-restaurant-info-text {
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.edit-restaurant-info-photo {
+    width: 300px; /* רוחב מותאם */
+    height: auto; /* שמירה על יחס תמונה */
+    border-radius: 8px; /* פינות מעוגלות */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* הצללה */
+    margin-top: 10px; /* ריווח מלמעלה */
+    display: block; /* מיקום עצמאי */
+}

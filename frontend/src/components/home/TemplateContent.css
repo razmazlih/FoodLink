@@ -1,0 +1,43 @@
+.template-content {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.template-content h3 {
+    font-size: 1.5rem;
+    color: #555;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.template-content h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.template-content p, .template-content li {
+    font-size: 1rem;
+    color: #444;
+    margin-bottom: 15px;
+}
+
+.template-content button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background: linear-gradient(135deg, #f0a500, #e6b100);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.template-content button:hover {
+    background: linear-gradient(135deg, #ca9b00, #a57f00);
+}

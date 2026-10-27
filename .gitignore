@@ -1,0 +1,20 @@
+# Local repository history backups
+.repository-backups/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+
+# Dependencies and generated files
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+*.sqlite3
+*.db

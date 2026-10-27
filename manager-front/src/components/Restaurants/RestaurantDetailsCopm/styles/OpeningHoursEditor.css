@@ -1,0 +1,57 @@
+.opening-hours {
+    margin: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.opening-hours__title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.opening-hours__day {
+    margin: 10px 0;
+}
+
+.opening-hours__no-data {
+    font-style: italic;
+    color: #6c757d;
+}
+
+.opening-hours__input-group {
+    margin: 10px 0;
+}
+
+.opening-hours__input {
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.opening-hours__edit-button,
+.opening-hours__save-button,
+.opening-hours__cancel-button {
+    margin: 5px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.opening-hours__edit-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.opening-hours__save-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.opening-hours__cancel-button {
+    background-color: #dc3545;
+    color: white;
+}

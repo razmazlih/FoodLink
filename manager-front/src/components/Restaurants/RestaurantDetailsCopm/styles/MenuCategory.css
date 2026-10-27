@@ -1,0 +1,54 @@
+.menu-category {
+    margin: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.menu-category__title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.menu-category__name {
+    font-weight: bold;
+}
+
+.menu-category__input {
+    padding: 5px;
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.menu-category__edit-button,
+.menu-category__save-button,
+.menu-category__cancel-button {
+    padding: 8px 15px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.menu-category__edit-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.menu-category__save-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.menu-category__cancel-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.menu-category__items {
+    list-style: none;
+    padding: 0;
+}

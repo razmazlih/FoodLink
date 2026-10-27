@@ -1,0 +1,22 @@
+.order-details-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .order-details-container h1,
+  .order-details-container h2 {
+    text-align: center;
+  }
+  
+  .order-details-container p {
+    margin: 10px 0;
+  }
+  
+  .order-details-container ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .order-details-container ul li {
+    margin: 5px 0;
+  }

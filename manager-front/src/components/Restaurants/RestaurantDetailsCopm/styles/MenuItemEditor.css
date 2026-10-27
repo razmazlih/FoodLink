@@ -1,0 +1,52 @@
+.menu-item-editor {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.menu-item-editor__input {
+    width: calc(100% - 20px);
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.menu-item-editor__name {
+    font-weight: bold;
+}
+
+.menu-item-editor__price {
+    color: #28a745;
+}
+
+.menu-item-editor__description {
+    margin: 5px 0;
+}
+
+.menu-item-editor__save-button,
+.menu-item-editor__cancel-button,
+.menu-item-editor__edit-button {
+    margin-right: 5px;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.menu-item-editor__edit-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.menu-item-editor__save-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.menu-item-editor__cancel-button {
+    background-color: #dc3545;
+    color: white;
+}

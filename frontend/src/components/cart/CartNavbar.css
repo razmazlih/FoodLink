@@ -1,0 +1,193 @@
+/* קביעת סגנון ל-navbar הכללי */
+.cart-navbar {
+    position: fixed;
+    top: 70px;
+    right: 10px;
+    width: 90%;
+    max-width: 400px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    z-index: 1000;
+    overflow: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+[dir="rtl"] .cart-navbar {
+    right: auto;
+    left: 10px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cart-navbar-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cart-button {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    font-size: 1.1rem;
+    background-color: #f0a500;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cart-button:hover {
+    background-color: #d89000;
+    transform: translateY(-2px);
+}
+
+.cart-items-container {
+    max-height: 140px;
+    overflow-y: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-right: 5px;
+    border-radius: 12px;
+}
+
+.cart-items-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cart-items-container::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 10px;
+}
+
+.cart-navbar-pas {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #777;
+    background-color: #f1f1f1;
+    padding: 18px;
+    border-radius: 8px;
+    border: 1px dashed #ccc;
+}
+
+@media screen and (max-width: 768px) {
+    .cart-navbar {
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: none;
+        border-radius: 12px 12px 0 0;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+        padding: 15px;
+        background-color: #ffffff;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    [dir="rtl"] .cart-navbar {
+        right: 0;
+        left: 0;
+    }
+
+    .cart-navbar-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .cart-navbar-pas {
+        font-size: 1.1rem;
+        color: #555;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .cart-items-container {
+        max-height: 250px;
+        overflow-y: auto;
+        margin-top: 10px;
+        border-radius: 8px;
+        padding-right: 5px;
+        scrollbar-width: thin;
+    }
+
+    .cart-items-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .cart-items-container::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 10px;
+    }
+
+    .cart-button {
+        width: 100%;
+        margin-top: 10px;
+        padding: 12px;
+        font-size: 1rem;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .cart-item-strong {
+        font-size: 1rem;
+        font-weight: 500;
+        flex-grow: 1;
+        color: #333;
+    }
+
+    .cart-item-span {
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .cart-item-button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .cart-item-button:hover {
+        background-color: #218838;
+    }
+}

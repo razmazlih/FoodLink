@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userbase-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server1
+  template:
+    metadata:
+      labels:
+        app: server1
+    spec:
+      containers:
+      - name: server1
+        image: server1-image:latest
+        envFrom:
+        - configMapRef:
+            name: server1-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server1-service
+spec:
+  selector:
+    app: server1
+  ports:
+    - protocol: TCP
+      port: 3000 # פורט השרת
+      targetPort: 3000

@@ -1,0 +1,54 @@
+.users-list-container,
+.user-form {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.users-table th,
+.users-table td {
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 8px;
+}
+
+.users-table th {
+  background-color: #f4f4f4;
+}
+
+.users-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+button {
+  margin: 5px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.user-form input,
+.user-form select {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+  font-size: 1rem;
+}
+
+.user-form button {
+  width: 100%;
+  padding: 10px;
+}

@@ -1,0 +1,34 @@
+.add-menu-item-container {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.add-menu-item-title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.add-menu-item-input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.add-menu-item-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-menu-item-button:hover {
+    background-color: #0056b3;
+}

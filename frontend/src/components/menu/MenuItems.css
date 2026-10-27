@@ -1,0 +1,229 @@
+.menu-items-container {
+    /* margin: 20px auto; */
+    padding: 20px;
+    /* max-width: 900px; */
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.menu-items-container:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.menu-title {
+    font-size: 2.5rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.category-container {
+    margin-bottom: 30px;
+}
+
+.category-title {
+    font-size: 1.7rem;
+    color: #444;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f0a500;
+}
+
+.menu-item-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/* פריט תפריט */
+.menu-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: transform 0.2s ease;
+    border: 1px solid #eee;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 320px;
+}
+
+.menu-item:hover {
+    transform: translateY(-3px);
+}
+
+.menu-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #333;
+}
+
+.menu-item-name {
+    font-size: 1.3rem;
+}
+
+.price {
+    color: #f0a500;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.menu-item-description {
+    font-size: 1rem;
+    color: #777;
+    margin-top: 8px;
+}
+
+.add-to-cart-btn {
+    font-size: 1.1rem;
+    padding: 10px 15px;
+    background-color: #f0a500;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #d89000;
+}
+
+.added-to-cart {
+    display: block;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #4caf50;
+    font-weight: bold;
+    padding: 7px 0px;
+    margin-top: 10px;
+    margin-bottom: 1px;
+    border-radius: 5px;
+    background-color: #e8f5e8;
+    border: 1px solid #4caf50;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.added-to-cart:hover {
+    background-color: #c8e6c9;
+    border-color: #388e3c;
+    color: #388e3c;
+    cursor: default;
+}
+
+.login-prompt-menu {
+    font-size: 1rem;
+    color: #ff5733 !important;
+    padding: 5px 10px;
+    background-color: #ffe4e4;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.login-prompt-menu:hover {
+    background-color: #ffcccc;
+}
+
+@media (max-width: 768px) {
+    .menu-items-container {
+        padding: 15px;
+        margin: 15px;
+    }
+
+    .menu-title {
+        font-size: 2rem;
+    }
+
+    .category-title {
+        font-size: 1.5rem;
+    }
+
+    .menu-item {
+        padding: 15px;
+    }
+
+    .menu-item-header {
+        font-size: 1.2rem;
+    }
+
+    .menu-item-description {
+        font-size: 0.9rem;
+    }
+
+    .add-to-cart-btn,
+    .added-to-cart {
+        font-size: 1rem;
+        padding: 8px;
+        margin-top: 12px;
+        margin-bottom: 0;
+    }
+
+    .menu-item-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .menu-item-name {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+
+    .price {
+        font-size: 1.2rem;
+        color: #f0a500;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .menu-item-description {
+        font-size: 1rem;
+        text-align: center;
+        color: #777;
+        margin-bottom: 10px;
+    }
+
+    .add-to-cart-btn,
+    .added-to-cart,
+    .login-prompt-menu {
+        align-self: stretch;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-items-container {
+        padding: 10px;
+        margin: 5px;
+    }
+
+    .menu-title {
+        font-size: 1.6rem;
+    }
+
+    .category-title {
+        font-size: 1.3rem;
+    }
+
+    .menu-item {
+        padding: 10px;
+    }
+
+    .menu-item-header {
+        font-size: 1rem;
+    }
+
+    .menu-item-description {
+        font-size: 0.85rem;
+    }
+}
