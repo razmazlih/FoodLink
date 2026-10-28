@@ -1,3 +1,4 @@
+from .database_options import postgres_schema_options
 from datetime import timedelta
 from pathlib import Path
 import dotenv
@@ -82,6 +83,7 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "razmaz123"),
         "HOST": os.getenv("POSTGRES_HOST", "db"),
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        "OPTIONS": postgres_schema_options(os.environ),
     }
 }
 

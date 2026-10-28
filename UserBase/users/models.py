@@ -17,6 +17,7 @@ class User(AbstractUser):
             )
         ],
     )
+    addresses = models.JSONField(null=True, blank=True, default=None)
     city = models.CharField(max_length=20)
     street_name = models.CharField(max_length=50)
     house_number = models.IntegerField(null=True)

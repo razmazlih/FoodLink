@@ -1,3 +1,5 @@
+> **Current runtime: Firebase Authentication + Cloud Firestore.** See [Firebase setup](../docs/firebase.md) and the root README. The SQL/Docker instructions below describe the retained legacy runtime.
+
 
 # DishBoard - Restaurant and Menu Management System
 
@@ -167,3 +169,15 @@ This project is licensed under the [MIT License](LICENSE).
 For any questions or suggestions, feel free to reach out at:
 - Linkedin: [Raz Mazlih](https://www.linkedin.com/in/raz-mazlih)
 - GitHub: [razmazlih](https://github.com/razmazlih)
+
+## Isolated regression tests
+
+Run from this service directory:
+
+```bash
+venv/bin/python manage.py test --settings=dish_board.test_settings
+```
+
+The test settings use an in-memory SQLite database and apply the committed historical
+migrations. They do not connect to the configured
+PostgreSQL database. Production migration configuration is unchanged.

@@ -1,0 +1,10 @@
+FROM python:3.12-slim
+ARG SERVICE
+WORKDIR /app
+COPY ${SERVICE}/requirements.firebase.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+COPY foodlink_core /app/foodlink_core
+COPY ${SERVICE} /app/service
+ENV PYTHONPATH=/app
+WORKDIR /app/service
+EXPOSE 8000

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime
+from sqlalchemy import Column, Integer, DateTime, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from models.base import Base
@@ -11,6 +11,7 @@ class OrderModel(Base):
     user_id = Column(Integer, nullable=False, index=True)
     restaurant_id = Column(Integer, nullable=False, index=True)
     ordered_at = Column(DateTime, default=None)
+    delivery_address = Column(JSON, nullable=True)
     items = relationship(
         "OrderItemModel", backref="order", cascade="all, delete-orphan"
     )

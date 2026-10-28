@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from cloudinary.models import CloudinaryField
+from .photos import DEFAULT_PHOTO_URL
 
 
 class Restaurant(models.Model):
@@ -11,7 +12,7 @@ class Restaurant(models.Model):
     photo = CloudinaryField('image', blank=True, null=True)
     photo_url = models.CharField(
         max_length=200,
-        default="https://res.cloudinary.com/drlmg8tzf/image/upload/v1736885696/py7lepbjsndwwwt7nszs.jpg",
+        default=DEFAULT_PHOTO_URL,
     )
 
     class Meta:

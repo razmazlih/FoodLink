@@ -42,8 +42,7 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c "python manage.py makemigrations &&
-             python manage.py migrate &&
+      sh -c "python manage.py migrate &&
              gunicorn -b 0.0.0.0:8000 user_base.wsgi:application"
     ports:
       - "8001:8000"

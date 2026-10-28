@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from init_db import init_db
+from db_config import auto_init_db
 from routes.order_routes import order_router
 from routes.order_item_routes import order_item_router
 from routes.order_status_websocket import order_status_ws_router
@@ -10,11 +11,12 @@ import dotenv
 
 dotenv.load_dotenv()
 
-init_db()
+if auto_init_db():
+    init_db()
 
 app = FastAPI()
 
-origins = getenv('CORS_ALLOWED_ORIGINS', ['http://localhost:3000']).split(',')
+origins = getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
 
 app.add_middleware(
     CORSMiddleware,

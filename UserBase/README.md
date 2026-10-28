@@ -1,3 +1,5 @@
+> **Current runtime: Firebase Authentication + Cloud Firestore.** See [Firebase setup](../docs/firebase.md) and the root README. The SQL/Docker instructions below describe the retained legacy runtime.
+
 
 # UserBase - Django Project
 
@@ -199,3 +201,15 @@ POSTGRES_PORT=5432
 ---
 
 Good luck!
+
+## Isolated regression tests
+
+Run from this service directory:
+
+```bash
+venv/bin/python manage.py test --settings=user_base.test_settings
+```
+
+The test settings use an in-memory SQLite database and apply the committed historical
+migrations. They do not connect to the configured
+PostgreSQL database. Production migration configuration is unchanged.

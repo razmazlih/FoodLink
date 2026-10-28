@@ -1,0 +1,14 @@
+.git/
+.repository-backups/
+**/venv/
+**/.venv/
+**/node_modules/
+**/__pycache__/
+**/*.py[cod]
+**/.env*
+**/*.sqlite3
+**/*.db
+**/build/
+**/*-debug.log
+.playwright-mcp/
+output/

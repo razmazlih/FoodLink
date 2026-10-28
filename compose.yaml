@@ -1,0 +1,29 @@
+name: foodlink-firebase
+x-environment: &firebase-environment
+  FIREBASE_PROJECT_ID: foodlink-razmaz
+  GOOGLE_APPLICATION_CREDENTIALS: /run/credentials/google.json
+  CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3002}
+  ALLOWED_HOSTS: localhost,127.0.0.1
+services:
+  userbase:
+    build: {context: ., dockerfile: infrastructure/Dockerfile.firebase, args: {SERVICE: UserBase}}
+    environment:
+      <<: *firebase-environment
+      DJANGO_SETTINGS_MODULE: user_base.firebase_settings
+    command: [gunicorn, -b, '0.0.0.0:8000', user_base.wsgi:application]
+    ports: ['127.0.0.1:8001:8000']
+    volumes: ['${GOOGLE_APPLICATION_CREDENTIALS:?Set a read-only credential file outside Git}:/run/credentials/google.json:ro']
+  dishboard:
+    build: {context: ., dockerfile: infrastructure/Dockerfile.firebase, args: {SERVICE: DishBoard}}
+    environment:
+      <<: *firebase-environment
+      DJANGO_SETTINGS_MODULE: dish_board.firebase_settings
+    command: [gunicorn, -b, '0.0.0.0:8000', dish_board.wsgi:application]
+    ports: ['127.0.0.1:8002:8000']
+    volumes: ['${GOOGLE_APPLICATION_CREDENTIALS:?Set a read-only credential file outside Git}:/run/credentials/google.json:ro']
+  orderline:
+    build: {context: ., dockerfile: infrastructure/Dockerfile.firebase, args: {SERVICE: OrderLine}}
+    environment: *firebase-environment
+    command: [uvicorn, firebase_main:app, --host, '0.0.0.0', --port, '8000', --workers, '1']
+    ports: ['127.0.0.1:8003:8000']
+    volumes: ['${GOOGLE_APPLICATION_CREDENTIALS:?Set a read-only credential file outside Git}:/run/credentials/google.json:ro']

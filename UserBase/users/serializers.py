@@ -1,11 +1,28 @@
 from rest_framework import serializers
 from .models import User
+from .addresses import normalize_addresses, profile_addresses, default_fields
 
 
 class UserSerializer(serializers.ModelSerializer):
+    addresses = serializers.JSONField(required=False)
+
+    def validate_addresses(self, value):
+        return normalize_addresses(value)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['addresses'] = profile_addresses(data)
+        return data
+
+    def update(self, instance, validated_data):
+        if 'addresses' in validated_data:
+            validated_data.update(default_fields(validated_data['addresses']))
+        return super().update(instance, validated_data)
+
     class Meta:
         model = User
         fields = [
+            "addresses",
             "id",
             "username",
             "email",

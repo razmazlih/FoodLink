@@ -1,23 +1,29 @@
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter
-from typing import List
 
 order_status_ws_router = APIRouter()
 
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: dict[int, list[WebSocket]] = {}
 
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, websocket: WebSocket, order_id: int):
         await websocket.accept()
-        self.active_connections.append(websocket)
+        self.active_connections.setdefault(order_id, []).append(websocket)
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    def disconnect(self, websocket: WebSocket, order_id: int):
+        connections = self.active_connections.get(order_id, [])
+        if websocket in connections:
+            connections.remove(websocket)
+        if not connections:
+            self.active_connections.pop(order_id, None)
 
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
+    async def broadcast(self, order_id: int, message: str):
+        for connection in list(self.active_connections.get(order_id, [])):
+            try:
+                await connection.send_text(message)
+            except (WebSocketDisconnect, RuntimeError, OSError):
+                self.disconnect(connection, order_id)
 
 
 manager = ConnectionManager()
@@ -25,15 +31,15 @@ manager = ConnectionManager()
 
 @order_status_ws_router.websocket("/ws/order-status/{order_id}")
 async def websocket_endpoint(websocket: WebSocket, order_id: int):
-    await manager.connect(websocket)
+    await manager.connect(websocket, order_id)
     try:
         while True:
-            data = await websocket.receive_text()
-            print(f"Received message for order {order_id}: {data}")
+            await websocket.receive_text()
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        print(f"Connection closed for order {order_id}")
+        pass
+    finally:
+        manager.disconnect(websocket, order_id)
 
 
 async def notify_order_status(order_id: int, status: str):
-    await manager.broadcast(status)
+    await manager.broadcast(order_id, status)

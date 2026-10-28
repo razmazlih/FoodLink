@@ -1,3 +1,61 @@
+> **Current runtime: Firebase Authentication + Cloud Firestore.** See [Firebase setup](../docs/firebase.md) and the root README. The SQL/Docker instructions below describe the retained legacy runtime.
+
+# Firebase mode (current root stack)
+
+The root stack runs `uvicorn firebase_main:app --host 0.0.0.0 --port 8000`.
+`firebase_main.py` imports no SQL models and performs no startup DDL. The
+standalone `main.py` application and PostgreSQL instructions below remain legacy
+compatibility tools; do not run SQL initialization for Firebase mode.
+
+Run from this service directory with the repository root on `PYTHONPATH`:
+
+```sh
+PYTHONPATH=.. venv/bin/python -m unittest discover -s tests -v
+PYTHONPATH=.. venv/bin/uvicorn firebase_main:app --port 8003
+```
+
+Install `requirements.txt` first. Configure `FIREBASE_PROJECT_ID=foodlink-razmaz`
+and Application Default Credentials for live access. Both emulator hosts must
+be supplied together with a separate `demo-` project for local emulator work;
+never mix emulator identities with the production project. Shared Firebase
+initialization and token verification live in the root `foodlink_core` package.
+
+Every OrderLine HTTP endpoint requires `Authorization: Bearer <Firebase ID token>`.
+WebSocket connections use `/ws/order-status/{order_id}` and must send a first
+JSON frame `{"type":"auth","token":"<Firebase ID token>"}` within 10 seconds.
+Subscription begins only after token and order-access verification. Invalid or
+missing authentication closes with 4401; denied order access closes with 4403.
+Token query parameters are ignored. Use WSS in hosted environments.
+Order IDs, item IDs, status IDs and restaurant IDs remain numeric; `user_id` is
+a Firebase UID string. Customers can access only their own orders. Trusted
+`admin` claims permit management access; `restaurant_owner` claims additionally
+require matching `restaurants.owner_uid`. Administrators can list all orders
+with `/orders/?all=true`; restaurant owners see only orders for their restaurants.
+
+Firestore collections are `orders`, `order_items`, `order_statuses` and shared
+`_counters`. Orders hold `user_id`, `restaurant_id`, `ordered_at`, `total_cents`
+and `state`. Item price/name/restaurant are verified against `menu_items` on
+creation. `price_cents` and `total_cents` are integers internally; outward `price`
+and `total_price` retain the existing numeric API representation. Client-supplied
+price and total values cannot override server prices. Item mutation plus total
+updates, and status creation plus order-state updates, run in Firestore
+transactions. No ownership or restaurant reassignment is allowed.
+
+A new order is a `draft`; only drafts permit line-item edits/deletion. Quantities
+must be integers from 0 to 1000. A nonempty draft may become `active`; draft or
+active orders may become `cancelled`. Only an authorized restaurant owner or
+administrator may change an active order to `delivered`. Final states cannot be
+reopened. Status WebSocket messages retain the existing plain status-string
+format and are delivered only to authenticated subscribers of the matching order.
+WebSocket fan-out is process-local; run one server process for live notifications.
+
+Firebase regression tests cover bearer authentication, ownership isolation,
+restaurant ownership, forged inputs, authoritative pricing, integer-cent totals,
+transaction read-before-write ordering, checkout locks, transitions and WebSocket
+access. In-memory tests do not substitute for emulator integration.
+
+---
+
 
 # OrderLine API
 
@@ -149,7 +207,7 @@ Send a `POST` request to `/order-status/`:
 }
 ```
 
-The WebSocket clients will receive a notification: `Order 1 status updated to Preparing`.
+Clients subscribed to order 1 receive the plain-text status `Preparing`.
 
 ---
 
@@ -186,3 +244,57 @@ The WebSocket clients will receive a notification: `Order 1 status updated to Pr
 
 ## License
 This project is licensed under the MIT License. See `LICENSE` for details.
+
+## Isolated regression tests
+
+Run from this service directory:
+
+```bash
+venv/bin/python -m unittest discover -s tests -v
+```
+
+Tests override the database dependency with in-memory SQLite and suppress startup
+schema initialization. They cover order totals and item/status serialization,
+constant query counts, the CORS default and per-order WebSocket delivery.
+`total_price` remains a calculated response field; a supplied update value is
+ignored, while writable order fields are updated normally. WebSocket messages
+remain plain status strings and are delivered only to the matching order channel.
+
+
+## Shared PostgreSQL database and explicit initialization
+
+The existing `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`
+and `POSTGRES_PASSWORD` settings remain supported. Credentials containing URL
+special characters are passed through SQLAlchemy's structured URL builder.
+
+Set `POSTGRES_SCHEMA=orderline` to isolate this service in a pre-created private
+schema. Only lowercase ASCII identifiers beginning with a letter or underscore
+(up to 63 characters) are accepted; `public`, `information_schema` and `pg_*`
+names are rejected. The connection search path contains only that schema, with
+no fallback to `public`. PostgreSQL's implicit system catalog resolution remains
+available. If `POSTGRES_SCHEMA` is unset, the previous driver search path is
+preserved for standalone installations. An explicitly empty schema is invalid.
+
+For a runtime database role with DML permissions only, set `AUTO_INIT_DB=false`
+to skip table creation when importing the FastAPI application. The default is
+`true` for compatibility with the standalone Compose setup. Accepted boolean
+values are `true`/`1`/`yes`/`on` and `false`/`0`/`no`/`off` (case insensitive).
+Invalid values fail startup rather than silently selecting a mode.
+
+Before starting runtime containers, run the explicit initializer from this
+directory with a separate migrator role's `POSTGRES_USER`/`POSTGRES_PASSWORD`,
+the same database and schema settings, and schema creation permissions:
+
+```sh
+python -m init_db
+```
+
+The CLI registers every OrderLine model and runs `create_all`, even when
+`AUTO_INIT_DB=false`. The database/schema and roles must already exist. This
+command creates missing tables; it neither copies existing data nor migrates
+or alters existing tables. Keep migrator credentials out of runtime containers.
+The root shared-database stack supplies separate initializer/runtime settings.
+
+Configuration tests verify credential escaping, private-schema validation,
+legacy defaults, startup without DDL and explicit model initialization, without
+connecting to PostgreSQL or changing real data.

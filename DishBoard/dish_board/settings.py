@@ -1,5 +1,6 @@
+from .database_options import postgres_schema_options
 from pathlib import Path
-from os import getenv
+from os import getenv, environ
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -78,6 +79,7 @@ if getenv('DATABASE') != 'test':
             'PASSWORD': getenv('POSTGRES_PASSWORD', 'razmaz123'),
             'HOST': getenv("POSTGRES_HOST", 'db'),
             'PORT': getenv('POSTGRES_PORT', '5432'),
+            'OPTIONS': postgres_schema_options(environ),
         }
     }
 else:

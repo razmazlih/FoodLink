@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from datetime import datetime
 
 from database import get_db
@@ -24,7 +24,9 @@ def create_order(order: OrderCreateSchema, db: Session = Depends(get_db)):
 
 @order_router.get("/", response_model=list[OrderSchema])
 def read_orders(user_id: int, db: Session = Depends(get_db)):
-    orders = db.query(OrderModel).filter(OrderModel.user_id == user_id).all()
+    orders = db.query(OrderModel).options(
+        selectinload(OrderModel.items), selectinload(OrderModel.status)
+    ).filter(OrderModel.user_id == user_id).all()
     return orders
 
 
@@ -43,7 +45,12 @@ def update_order(
     order = db.query(OrderModel).filter(OrderModel.id == order_id).first()
     if order is None:
         raise HTTPException(status_code=404, detail="Order not found")
-    for key, value in order_update.model_dump(exclude_unset=True).items():
+    if 'delivery_address' in order_update.model_fields_set:
+        if order.status:
+            raise HTTPException(status_code=409, detail="Only draft orders can change delivery address")
+        if order_update.delivery_address is None:
+            raise HTTPException(status_code=422, detail="Delivery address cannot be empty")
+    for key, value in order_update.model_dump(exclude_unset=True, exclude={"total_price"}).items():
         setattr(order, key, value)
     db.commit()
     db.refresh(order)

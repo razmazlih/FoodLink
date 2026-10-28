@@ -18,3 +18,16 @@ __pycache__/
 .DS_Store
 *.sqlite3
 *.db
+
+# Local Firebase emulators and browser acceptance output
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+*-debug.log
+.firebase/
+.firebase-emulator-data/
+.playwright-mcp/
+output/playwright/
+
+# Local service controller state and logs
+.local-services/

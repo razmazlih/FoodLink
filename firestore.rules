@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Browsers use the authenticated APIs. Only the server's Admin SDK accesses data.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -49,8 +49,7 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c "python manage.py makemigrations &&
-             python manage.py migrate &&
+      sh -c "python manage.py migrate &&
              ${RUN_PROJECT}"
     ports:
       - "8002:8000"

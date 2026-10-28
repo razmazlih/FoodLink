@@ -3,9 +3,11 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from .models import OpeningHours, Restaurant
 from .serializers import OpeningHoursSerializer, RestaurantSerializer
-import cloudinary
+from .photos import photo_url_for_upload
+from .opening_hours import is_open_at, next_opening_time
 from datetime import datetime
 from django.utils.timezone import make_aware
+from django.db.models import Prefetch
 
 
 class RestaurantViewSet(ModelViewSet):
@@ -14,40 +16,33 @@ class RestaurantViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         image_file = self.request.FILES.get("photo")
-        if image_file:
-            upload_result = cloudinary.uploader.upload(image_file)
-            photo_url = upload_result.get("secure_url")
-        else:
-            photo_url = "https://res.cloudinary.com/drlmg8tzf/image/upload/v1736885696/py7lepbjsndwwwt7nszs.jpg"
-
-        serializer.save(photo_url=photo_url)
+        serializer.save(photo_url=photo_url_for_upload(image_file))
 
     def perform_update(self, serializer):
         image_file = self.request.FILES.get("photo")
         if image_file:
-            upload_result = cloudinary.uploader.upload(image_file)
-            photo_url = upload_result.get("secure_url")
-            serializer.save(photo_url=photo_url)
+            serializer.save(photo_url=photo_url_for_upload(image_file))
         else:
             serializer.save()
 
     def list(self, request, *args, **kwargs):
         fields = request.query_params.get("fields", None)
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().prefetch_related(
+            Prefetch("opening_hours", queryset=OpeningHours.objects.filter(is_open=True).order_by("pk"),
+                     to_attr="open_hours")
+        )
         now = make_aware(datetime.now())
         current_day = now.strftime("%A")
         current_time = now.time()
 
         restaurants_data = []
         for restaurant in queryset:
-            today_hours = OpeningHours.objects.filter(
-                restaurant=restaurant, day_of_week=current_day, is_open=True
-            ).first()
-
-            is_open_now = (
-                today_hours
-                and today_hours.opening_time <= current_time <= today_hours.closing_time
+            today_hours = next(
+                (hours for hours in restaurant.open_hours if hours.day_of_week == current_day),
+                None,
             )
+
+            is_open_now = is_open_at(today_hours, current_time)
 
             restaurants_data.append(
                 {"restaurant": restaurant, "is_open_now": bool(is_open_now)}
@@ -103,12 +98,8 @@ class OpeningHouersViewSet(ModelViewSet):
             restaurant__id=restaurant_id, day_of_week=current_day
         ).first()
 
-        if today_hours and today_hours.is_open:
-            opening_time = today_hours.opening_time
-            closing_time = today_hours.closing_time
-
-            if opening_time <= current_time <= closing_time:
-                return Response({"is_open": True, "closes_at": closing_time})
+        if is_open_at(today_hours, current_time):
+            return Response({"is_open": True, "closes_at": today_hours.closing_time})
 
         next_day_hours = self.get_next_opening_time(restaurant_id, current_day)
 
@@ -124,29 +115,4 @@ class OpeningHouersViewSet(ModelViewSet):
         return Response({"is_open": False, "message": "No opening hours available."})
 
     def get_next_opening_time(self, restaurant_id, current_day):
-        days_of_week = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-        ]
-
-        current_index = days_of_week.index(current_day)
-        for i in range(1, 8):
-            next_day_index = (current_index + i) % 7
-            next_day = days_of_week[next_day_index]
-
-            next_day_hours = OpeningHours.objects.filter(
-                restaurant__id=restaurant_id, day_of_week=next_day, is_open=True
-            ).first()
-
-            if next_day_hours:
-                return {
-                    "day_of_week": next_day,
-                    "opening_time": next_day_hours.opening_time,
-                }
-
-        return None
+        return next_opening_time(restaurant_id, current_day)

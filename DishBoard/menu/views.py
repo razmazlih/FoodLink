@@ -1,5 +1,4 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action
 from menu.models import Category, Item
 from rest_framework.response import Response
 from menu.serializers import CategorySerializer, ItemSerializer
@@ -7,7 +6,7 @@ from rest_framework import status
 
 
 class CategoryViewSet(ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.prefetch_related("items")
     serializer_class = CategorySerializer
 
     def list(self, request, *args, **kwargs):
