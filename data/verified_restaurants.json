@@ -1,0 +1,149 @@
+{
+  "verified_on": "2026-10-28",
+  "restaurants": [
+    {
+      "key": "cafe-noir-tel-aviv",
+      "name": "קפה נואר",
+      "city": "תל אביב-יפו",
+      "address": "אחד העם 43",
+      "source_url": "https://www.cafenoir.co.il/menu/food",
+      "branch_source_url": "https://www.cafenoir.co.il/",
+      "price_context": "מחירי התפריט המפורסם באתר המסעדה, בשקלים. מבחר מנות בלבד; המחירים עשויים להשתנות ואינם מחירי משלוח מאומתים.",
+      "categories": [
+        {
+          "name": "מבחר מהתפריט הרשמי",
+          "items": [
+            {
+              "name": "חציל שרוף באש",
+              "price_cents": 6700
+            },
+            {
+              "name": "ארנצ׳יני",
+              "price_cents": 6500
+            },
+            {
+              "name": "סלט קיסר",
+              "price_cents": 6200
+            },
+            {
+              "name": "ניוקי ביתי בחמאת עגבניות",
+              "price_cents": 8500
+            },
+            {
+              "name": "שניצל חזה עוף",
+              "price_cents": 8400
+            },
+            {
+              "name": "המבורגר",
+              "price_cents": 8500
+            },
+            {
+              "name": "פילה דניס",
+              "price_cents": 12800
+            },
+            {
+              "name": "טירמיסו",
+              "price_cents": 5600
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "goocha-dizengoff",
+      "name": "גוצ׳ה דיזנגוף",
+      "city": "תל אביב-יפו",
+      "address": "דיזנגוף 171",
+      "source_url": "https://www.goocha.co.il/wp-content/uploads/2026/09/תפריט-קטן-עדכון-קיץ-26-עברית.pdf",
+      "branch_source_url": "https://www.goocha.co.il/גוצה-דיזנגוף/",
+      "price_context": "מחירי התפריט המפורסם באתר המסעדה, בשקלים. מבחר מנות בלבד; המחירים עשויים להשתנות ואינם מחירי משלוח מאומתים.",
+      "categories": [
+        {
+          "name": "מבחר מהתפריט הרשמי",
+          "items": [
+            {
+              "name": "שרימפס חמאה ושום",
+              "price_cents": 8400
+            },
+            {
+              "name": "מיקס פירות ים חמאה ושום",
+              "price_cents": 10500
+            },
+            {
+              "name": "קארי פירות ים",
+              "price_cents": 10500
+            },
+            {
+              "name": "צ׳יזבורגר",
+              "price_cents": 8400
+            },
+            {
+              "name": "קיסר שרימפס",
+              "price_cents": 7900
+            },
+            {
+              "name": "לינגוויני פירות ים",
+              "price_cents": 10400
+            },
+            {
+              "name": "פיש & צ׳יפס",
+              "price_cents": 8700
+            },
+            {
+              "name": "קוד שחור במיסו",
+              "price_cents": 14700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "raffaello-ein-shemer",
+      "name": "רפאלו עין שמר",
+      "city": "עין עירון",
+      "address": "מתחם אלונית פאשן",
+      "source_url": "https://www.raffaello.co.il/einshemer/main_einshemer",
+      "branch_source_url": "https://www.raffaello.co.il/branches/einshemer",
+      "price_context": "מחירי התפריט המפורסם באתר המסעדה, בשקלים. מבחר מנות בלבד; המחירים עשויים להשתנות ואינם מחירי משלוח מאומתים.",
+      "categories": [
+        {
+          "name": "מבחר מהתפריט הרשמי",
+          "items": [
+            {
+              "name": "לינגוויני רומסקו ודג מעושן",
+              "price_cents": 11400
+            },
+            {
+              "name": "לברק וריזוטו תרד",
+              "price_cents": 13900
+            },
+            {
+              "name": "פילה בס ניוקי בחמאת מרווה וזעפרן",
+              "price_cents": 14200
+            },
+            {
+              "name": "לינגוויני די מארה",
+              "price_cents": 10200
+            },
+            {
+              "name": "ריזוטו שרימפס",
+              "price_cents": 12900
+            },
+            {
+              "name": "פולו ספינצ׳ה",
+              "price_cents": 8900
+            },
+            {
+              "name": "קמפנלה פילה אנגוס ולקט פטריות",
+              "price_cents": 11600
+            },
+            {
+              "name": "קנלוני עגל",
+              "price_cents": 9100
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
