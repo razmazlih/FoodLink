@@ -1,6 +1,6 @@
 .dashboard-container {
     padding: 20px;
-    font-family: Arial, sans-serif;
+    font-family: inherit;
   }
   
   .dashboard-container h1 {
@@ -15,8 +15,8 @@
   }
   
   .stat-card {
-    background: #f9f9f9;
-    border: 1px solid #ddd;
+    background: var(--paper);
+    border: 1px solid var(--line);
     border-radius: 8px;
     text-align: center;
     padding: 20px;
@@ -30,11 +30,11 @@
   
   .stat-card p {
     font-size: 1.2rem;
-    color: #555;
+    color: var(--muted);
   }
   
   .dashboard-loading {
     text-align: center;
     font-size: 1.5rem;
-    color: #666;
+    color: var(--muted);
   }

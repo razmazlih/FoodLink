@@ -1,7 +1,7 @@
 .menu-item-editor {
     margin: 10px 0;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--line);
     border-radius: 5px;
     background-color: #fff;
 }
@@ -10,7 +10,7 @@
     width: calc(100% - 20px);
     padding: 5px;
     margin: 5px 0;
-    border: 1px solid #ccc;
+    border: 1px solid var(--line);
     border-radius: 4px;
 }
 
@@ -19,7 +19,7 @@
 }
 
 .menu-item-editor__price {
-    color: #28a745;
+    color: var(--ink);
 }
 
 .menu-item-editor__description {
@@ -37,16 +37,16 @@
 }
 
 .menu-item-editor__edit-button {
-    background-color: #007bff;
+    background-color: var(--ink);
     color: white;
 }
 
 .menu-item-editor__save-button {
-    background-color: #28a745;
+    background-color: var(--ink);
     color: white;
 }
 
 .menu-item-editor__cancel-button {
-    background-color: #dc3545;
+    background-color: #9b3731;
     color: white;
 }

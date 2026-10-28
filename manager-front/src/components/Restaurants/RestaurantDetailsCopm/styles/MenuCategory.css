@@ -1,9 +1,9 @@
 .menu-category {
     margin: 20px;
     padding: 15px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--line);
     border-radius: 8px;
-    background-color: #f8f9fa;
+    background-color: var(--paper);
 }
 
 .menu-category__title {
@@ -19,7 +19,7 @@
     padding: 5px;
     width: 100%;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--line);
     border-radius: 5px;
 }
 
@@ -34,17 +34,17 @@
 }
 
 .menu-category__edit-button {
-    background-color: #007bff;
+    background-color: var(--ink);
     color: white;
 }
 
 .menu-category__save-button {
-    background-color: #28a745;
+    background-color: var(--ink);
     color: white;
 }
 
 .menu-category__cancel-button {
-    background-color: #dc3545;
+    background-color: #9b3731;
     color: white;
 }
 

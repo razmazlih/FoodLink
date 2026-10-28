@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
-import axios from 'axios';
+import { fetchDashboardStats } from '../../services/api';
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -10,16 +10,18 @@ function Dashboard() {
     totalRevenue: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   // Fetch statistics from the API
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/dashboard/stats`);
+        const response = await fetchDashboardStats();
         setStats(response.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching stats:', error);
+        setError(true);
         setLoading(false);
       }
     };
@@ -31,9 +33,13 @@ function Dashboard() {
     return <div className="dashboard-loading">Loading...</div>;
   }
 
+  if (error) return <div className="dashboard-error" role="alert">Unable to load your business overview. Please refresh to try again.</div>;
+
   return (
     <div className="dashboard-container">
-      <h1>Admin Dashboard</h1>
+      <span className="eyebrow">YOUR WORKSPACE AT A GLANCE</span>
+      <h1>Business overview</h1>
+      <p className="page-description">A little clarity for your everyday operations.</p>
       <div className="dashboard-stats">
         <div className="stat-card">
           <h2>{stats.totalUsers}</h2>

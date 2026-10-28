@@ -1,9 +1,9 @@
 .opening-hours {
     margin: 20px;
     padding: 15px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--line);
     border-radius: 8px;
-    background-color: #f8f9fa;
+    background-color: var(--paper);
 }
 
 .opening-hours__title {
@@ -17,7 +17,7 @@
 
 .opening-hours__no-data {
     font-style: italic;
-    color: #6c757d;
+    color: var(--muted);
 }
 
 .opening-hours__input-group {
@@ -27,7 +27,7 @@
 .opening-hours__input {
     margin: 5px;
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--line);
     border-radius: 4px;
 }
 
@@ -42,16 +42,16 @@
 }
 
 .opening-hours__edit-button {
-    background-color: #007bff;
+    background-color: var(--ink);
     color: white;
 }
 
 .opening-hours__save-button {
-    background-color: #28a745;
+    background-color: var(--ink);
     color: white;
 }
 
 .opening-hours__cancel-button {
-    background-color: #dc3545;
+    background-color: #9b3731;
     color: white;
 }

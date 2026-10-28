@@ -1,8 +1,8 @@
 /* Container styles */
 .restaurant-list {
   padding: 20px;
-  font-family: 'Arial', sans-serif;
-  background-color: #f9f9f9;
+  font-family: inherit;
+  background-color: var(--paper);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -10,7 +10,7 @@
 .restaurant-list__title {
   margin-bottom: 20px;
   font-size: 2rem;
-  color: #333;
+  color: var(--ink);
 }
 
 /* Controls */
@@ -24,22 +24,22 @@
 .restaurant-list__search {
   padding: 10px;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--line);
   border-radius: 6px;
   width: 300px;
 }
 
 .restaurant-list__search:focus {
-  border-color: #007bff;
+  border-color: var(--ink);
   outline: none;
-  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 0 6px rgba(23, 62, 53, 0.12);
 }
 
 .restaurant-list__button {
   padding: 10px 20px;
   font-size: 1rem;
   color: white;
-  background-color: #007bff;
+  background-color: var(--ink);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -47,7 +47,7 @@
 }
 
 .restaurant-list__button:hover {
-  background-color: #0056b3;
+  background-color: #2c574a;
 }
 
 /* Table */
@@ -61,7 +61,7 @@
 }
 
 .restaurant-list__thead {
-  background-color: #007bff;
+  background-color: var(--ink);
   color: white;
 }
 
@@ -75,11 +75,11 @@
 }
 
 .restaurant-list__tbody .restaurant-list__row:nth-child(even) {
-  background-color: #f7f7f7;
+  background-color: #f7f8f3;
 }
 
 .restaurant-list__row:hover {
-  background-color: #f0f8ff;
+  background-color: #edf3e7;
   cursor: pointer;
 }
 
@@ -87,13 +87,13 @@
   padding: 12px;
   text-align: left;
   font-size: 0.9rem;
-  color: #333;
+  color: var(--ink);
 }
 
 /* Loading and error states */
 .restaurant-list__loading,
 .restaurant-list__error {
   text-align: center;
-  color: #666;
+  color: var(--muted);
   font-size: 1.2rem;
 }

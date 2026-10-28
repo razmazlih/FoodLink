@@ -1,49 +1,54 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { onIdTokenChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getFirebaseAuth } from '../firebase';
 
 export const AuthContext = createContext();
+const managerRole = async (user) => {
+  if (!user) return null;
+  const { claims } = await user.getIdTokenResult();
+  const role = claims.admin === true ? 'admin' : claims.role;
+  return ['admin', 'restaurant_owner'].includes(role) ? role : null;
+};
+const session = (user, role) => ({ user: user && role ? { id: user.uid, name: user.displayName || user.email, role } : null });
 
 export function AuthProvider({ children }) {
-  const [auth, setAuth] = useState({
-    user: null,
-    token: null,
-  });
+  const [auth, setAuth] = useState({ user: null });
+  const [loading, setLoading] = useState(true);
 
-  // Check for an existing session on component mount
   useEffect(() => {
-    const savedAuth = JSON.parse(localStorage.getItem('auth'));
-    if (savedAuth) {
-      setAuth(savedAuth);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${savedAuth.token}`;
-    }
+    let active = true;
+    let revision = 0;
+    const unsubscribe = onIdTokenChanged(getFirebaseAuth(), async (user) => {
+      const current = ++revision;
+      try {
+        const role = await managerRole(user);
+        if (active && current === revision) setAuth(session(user, role));
+      } catch {
+        if (active && current === revision) setAuth({ user: null });
+      } finally {
+        localStorage.removeItem('auth');
+        if (active && current === revision) setLoading(false);
+      }
+    });
+    return () => { active = false; unsubscribe(); };
   }, []);
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
-        email,
-        password,
-      });
-      const { user, token } = response.data;
-      setAuth({ user, token });
-      localStorage.setItem('auth', JSON.stringify({ user, token }));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      return true;
-    } catch (error) {
-      console.error('Login failed:', error);
+      const credential = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+      const role = await managerRole(credential.user);
+      if (!role) { await signOut(getFirebaseAuth()); return false; }
+      setAuth(session(credential.user, role));
+      return role;
+    } catch {
       return false;
     }
   };
-
-  const logout = () => {
-    setAuth({ user: null, token: null });
+  const logout = async () => {
+    await signOut(getFirebaseAuth());
     localStorage.removeItem('auth');
-    delete axios.defaults.headers.common['Authorization'];
+    setAuth({ user: null });
   };
 
-  return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ auth, loading, login, logout }}>{loading ? null : children}</AuthContext.Provider>;
 }

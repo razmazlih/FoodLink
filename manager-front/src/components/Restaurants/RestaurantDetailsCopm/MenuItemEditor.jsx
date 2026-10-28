@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import './styles/MenuItemEditor.css';
 
 function MenuItemEditor({ item, categoryId, handleMenuItemUpdate }) {
     const [isEditing, setIsEditing] = useState(false);
+    const fieldId = useId();
     const [editedItem, setEditedItem] = useState(item);
 
     const handleEditClick = () => {
@@ -31,7 +32,9 @@ function MenuItemEditor({ item, categoryId, handleMenuItemUpdate }) {
         <li className="menu-item-editor">
             {isEditing ? (
                 <>
+                    <label className="field-label" htmlFor={`${fieldId}-name`}> Item name</label>
                     <input
+                        id={`${fieldId}-name`}
                         className="menu-item-editor__input"
                         type="text"
                         name="name"
@@ -39,7 +42,9 @@ function MenuItemEditor({ item, categoryId, handleMenuItemUpdate }) {
                         onChange={handleChange}
                         placeholder="Item Name"
                     />
+                    <label className="field-label" htmlFor={`${fieldId}-price`}> Price (₪)</label>
                     <input
+                        id={`${fieldId}-price`}
                         className="menu-item-editor__input"
                         type="number"
                         name="price"
@@ -47,8 +52,11 @@ function MenuItemEditor({ item, categoryId, handleMenuItemUpdate }) {
                         onChange={handleChange}
                         placeholder="Price"
                         min="0"
+                        step="0.01"
                     />
+                    <label className="field-label" htmlFor={`${fieldId}-description`}> Description</label>
                     <input
+                        id={`${fieldId}-description`}
                         className="menu-item-editor__input"
                         type="text"
                         name="description"

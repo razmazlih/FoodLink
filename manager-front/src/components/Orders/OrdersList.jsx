@@ -1,17 +1,29 @@
+import { notify } from '../Feedback/Feedback';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { fetchManagerOrders, setManagerOrderStatus } from '../../services/api';
 import './OrdersList.css';
+import { useNavigate } from 'react-router-dom';
 
 function OrdersList() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleUpdateStatus = async (id) => {
+    try {
+      await setManagerOrderStatus(id, 'delivered');
+      setOrders((current) => current.map((order) => order.id === id ? { ...order, status: 'delivered' } : order));
+    } catch {
+      notify('Failed to update order status.');
+    }
+  };
 
   // Fetch orders from API
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/orders`);
+        const response = await fetchManagerOrders();
         setOrders(response.data);
         setLoading(false);
       } catch (err) {
@@ -33,7 +45,9 @@ function OrdersList() {
 
   return (
     <div className="orders-list-container">
+      <span className="eyebrow">FROM KITCHEN TO DOOR</span>
       <h1>Orders</h1>
+      <p className="page-description">Keep every order moving, from preparation to delivery.</p>
       <table className="orders-table">
         <thead>
           <tr>
@@ -46,16 +60,17 @@ function OrdersList() {
           </tr>
         </thead>
         <tbody>
+          {orders.length === 0 && <tr><td data-label="ID" colSpan={6} className="table-empty">No orders yet. New orders will appear here.</td></tr>}
           {orders.map((order) => (
             <tr key={order.id}>
-              <td>{order.id}</td>
-              <td>{order.user}</td>
-              <td>{order.restaurant}</td>
-              <td>${order.total.toFixed(2)}</td>
-              <td>{order.status}</td>
+              <td data-label="User">{order.id}</td>
+              <td data-label="Restaurant">{order.user}</td>
+              <td data-label="Total">{order.restaurant}</td>
+              <td data-label="Status">${order.total.toFixed(2)}</td>
+              <td data-label="Actions"><span className={`status-badge status-badge--${order.status}`}>{order.status}</span></td>
               <td>
-                <button onClick={() => handleViewDetails(order.id)}>View</button>
-                <button onClick={() => handleUpdateStatus(order.id)}>Update Status</button>
+                <button onClick={() => navigate(`/orders/${order.id}`)}>View</button>
+                <button disabled={order.status !== 'active'} onClick={() => handleUpdateStatus(order.id)}>Mark Delivered</button>
               </td>
             </tr>
           ))}
@@ -64,15 +79,5 @@ function OrdersList() {
     </div>
   );
 }
-
-const handleViewDetails = (id) => {
-  // Navigate to details page or display a modal
-  console.log(`Viewing details for order ${id}`);
-};
-
-const handleUpdateStatus = (id) => {
-  // Logic to update the status
-  console.log(`Updating status for order ${id}`);
-};
 
 export default OrdersList;

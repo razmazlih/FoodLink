@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { dashboardApi } from '../../services/api';
 import './RestaurantList.css';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function RestaurantList() {
   const [restaurants, setRestaurants] = useState([]);
@@ -57,9 +57,12 @@ function RestaurantList() {
 
   return (
     <div className="restaurant-list">
+      <span className="eyebrow">YOUR RESTAURANT COLLECTION</span>
       <h1 className="restaurant-list__title">Restaurants</h1>
+      <p className="page-description">Keep your restaurant details and menus fresh and up to date.</p>
       <div className="restaurant-list__controls">
         <input
+          aria-label="Search restaurants"
           type="text"
           placeholder="Search by name, address, or city"
           value={searchTerm}
@@ -79,15 +82,16 @@ function RestaurantList() {
           </tr>
         </thead>
         <tbody className="restaurant-list__tbody">
+          {filteredRestaurants.length === 0 && <tr><td colSpan={3} className="table-empty">No restaurants found. Try a different search or create a restaurant.</td></tr>}
           {filteredRestaurants.map((restaurant) => (
             <tr
               key={restaurant.id}
               onClick={() => handleRowClick(restaurant.id)}
               className="restaurant-list__row"
             >
-              <td className="restaurant-list__cell">{restaurant.id}</td>
-              <td className="restaurant-list__cell">{restaurant.name}</td>
-              <td className="restaurant-list__cell">{restaurant.address}, {restaurant.city}</td>
+              <td data-label="ID" className="restaurant-list__cell">{restaurant.id}</td>
+              <td data-label="Name" className="restaurant-list__cell"><Link to={`/restaurants/${restaurant.id}`} onClick={(event) => event.stopPropagation()}>{restaurant.name}</Link></td>
+              <td data-label="Address" className="restaurant-list__cell">{restaurant.address}, {restaurant.city}</td>
             </tr>
           ))}
         </tbody>

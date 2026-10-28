@@ -1,3 +1,4 @@
+import { notify } from '../../Feedback/Feedback';
 import React, { useState } from 'react';
 import MenuItemEditor from './MenuItemEditor';
 import AddMenuItem from './AddMenuItem';
@@ -8,6 +9,7 @@ function MenuCategory({
     category,
     handleUpdateCategory,
     handleMenuItemUpdate,
+    handleMenuItemAdded,
 }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editedName, setEditedName] = useState(category?.name || '');
@@ -21,12 +23,9 @@ function MenuCategory({
                 category: category.id,
             });
 
-            handleUpdateCategory(category.id, {
-                ...category,
-                items: [...category.items, response.data],
-            });
+            handleMenuItemAdded(category.id, response.data);
         } catch (error) {
-            alert(error.message);
+            notify(error.message);
         }
     };
 
@@ -37,6 +36,7 @@ function MenuCategory({
                     <span className="menu-category__name">{category.name}</span>
                 ) : (
                     <input
+                        aria-label="Category name"
                         className="menu-category__input"
                         type="text"
                         value={editedName}
@@ -49,7 +49,7 @@ function MenuCategory({
                     className="menu-category__edit-button"
                     onClick={() => setIsEditing(true)}
                 >
-                    Edit
+                    Rename category
                 </button>
             ) : (
                 <>
@@ -73,6 +73,7 @@ function MenuCategory({
                 </>
             )}
             <ul className="menu-category__items">
+                {category.items.length === 0 && <li className="editor-empty">No dishes here yet. Add your first menu item below.</li>}
                 {category.items.map((item) => (
                     <MenuItemEditor
                         key={item.id}

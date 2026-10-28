@@ -4,9 +4,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: var(--ink);
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: inherit;
   }
   
   .navbar-logo a {
@@ -50,7 +50,7 @@
   
   .navbar-logout {
     padding: 5px 10px;
-    background-color: #dc3545;
+    background-color: #9b3731;
     color: white;
     border: none;
     border-radius: 5px;
@@ -58,5 +58,5 @@
   }
   
   .navbar-logout:hover {
-    background-color: #c82333;
+    background-color: #7c2925;
   }

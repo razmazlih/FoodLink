@@ -1,3 +1,4 @@
+import { notify } from '../Feedback/Feedback';
 import React, { useState } from 'react';
 import { dashboardApi } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -18,10 +19,10 @@ function RestaurantForm() {
       const newRestaurantData = { name, city, address };
 
       const { data } = await dashboardApi.post('/restaurants/info/', newRestaurantData);
-      navigate(`/restaurant/${data.id}`);
+      navigate(`/restaurants/${data.id}`);
     } catch (error) {
       console.error('Error adding restaurant:', error);
-      alert('Failed to add restaurant.');
+      notify('Failed to add restaurant.');
     } finally {
       setLoading(false);
     }
@@ -29,7 +30,9 @@ function RestaurantForm() {
 
   return (
     <div className="restaurant-form__container">
-      <h2 className="restaurant-form__title">Add New Restaurant</h2>
+      <span className="eyebrow">GROW YOUR COLLECTION</span>
+      <h1 className="restaurant-form__title">Add a restaurant</h1>
+      <p className="page-description">Start with the essentials. Add your menu, photo, and opening hours next.</p>
       <form onSubmit={handleSubmit} className="restaurant-form__form">
         <div className="restaurant-form__field">
           <label htmlFor="name" className="restaurant-form__label">Name:</label>

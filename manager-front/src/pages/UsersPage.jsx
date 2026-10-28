@@ -15,7 +15,7 @@ function UsersPage() {
       {selectedUser ? (
         <UserForm userId={selectedUser} onSuccess={handleSuccess} />
       ) : (
-        <UsersList />
+        <UsersList onEdit={setSelectedUser} />
       )}
     </div>
   );

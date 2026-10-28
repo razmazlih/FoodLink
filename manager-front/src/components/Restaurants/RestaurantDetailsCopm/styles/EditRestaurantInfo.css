@@ -15,7 +15,7 @@
     width: 100%;
     padding: 8px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    border: 1px solid var(--line);
     border-radius: 5px;
 }
 
@@ -23,7 +23,7 @@
 .edit-restaurant-info-edit-button {
     padding: 10px 20px;
     margin: 5px;
-    background-color: #28a745;
+    background-color: var(--ink);
     color: white;
     border: none;
     border-radius: 5px;
@@ -31,11 +31,11 @@
 }
 
 .edit-restaurant-info-save-button:hover {
-    background-color: #218838;
+    background-color: #2c574a;
 }
 
 .edit-restaurant-info-edit-button:hover {
-    background-color: #218838;
+    background-color: #2c574a;
 }
 
 .edit-restaurant-info-text {

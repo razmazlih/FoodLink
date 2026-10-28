@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -7,30 +7,28 @@ function Navbar() {
   const { auth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" aria-label="Management navigation">
       <div className="navbar-logo">
-        <Link to="/dashboard">Admin Panel</Link>
+        <Link to={auth.user ? (auth.user.role === 'admin' ? '/dashboard' : '/restaurants') : '/'}><span className="brand-symbol" aria-hidden="true">f.</span> FoodLink <span className="brand-label">MANAGE</span></Link>
       </div>
-      <ul className="navbar-links">
+      {auth.user && <ul className="navbar-links">
+        {auth.user?.role === 'admin' && <>
+          <li><NavLink to="/dashboard">Dashboard</NavLink></li>
+          <li><NavLink to="/users">Users</NavLink></li>
+        </>}
         <li>
-          <Link to="/dashboard">Dashboard</Link>
+          <NavLink to="/restaurants">Restaurants</NavLink>
         </li>
         <li>
-          <Link to="/users">Users</Link>
+          <NavLink to="/orders">Orders</NavLink>
         </li>
-        <li>
-          <Link to="/restaurants">Restaurants</Link>
-        </li>
-        <li>
-          <Link to="/orders">Orders</Link>
-        </li>
-      </ul>
+      </ul>}
       <div className="navbar-auth">
         {auth.user ? (
           <>

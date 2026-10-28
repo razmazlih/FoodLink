@@ -1,3 +1,4 @@
+import { notify } from '../Feedback/Feedback';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { dashboardApi } from '../../services/api';
@@ -67,7 +68,7 @@ function RestaurantDetails() {
             });
             setPhotoUrl(data.photo_url);
         } catch (err) {
-            alert('Failed to update restaurant info.');
+            notify('Failed to update restaurant info.');
         }
     };
 
@@ -85,7 +86,7 @@ function RestaurantDetails() {
             }
             setOpeningHours(days);
         } catch (err) {
-            alert('Failed to update opening hours.');
+            notify('Failed to update opening hours.');
         }
     };
 
@@ -103,28 +104,34 @@ function RestaurantDetails() {
                 )
             );
         } catch (err) {
-            alert('Failed to update category.');
+            notify('Failed to update category.');
         }
     };
 
     const handleMenuItemUpdate = async (categoryId, itemId, updatedItem) => {
         try {
-            await dashboardApi.patch(`/menu/item/${itemId}/`, updatedItem);
+            const { name, price, description, is_available } = updatedItem;
+            const response = await dashboardApi.patch(`/menu/item/${itemId}/`, { name, price, description, is_available });
             setMenu((prevMenu) =>
                 prevMenu.map((category) =>
                     category.id === categoryId
                         ? {
                               ...category,
                               items: category.items.map((item) =>
-                                  item.id === itemId ? updatedItem : item
+                                  item.id === itemId ? response.data : item
                               ),
                           }
                         : category
                 )
             );
         } catch (err) {
-            alert('Failed to update menu item.');
+            notify('Failed to update menu item.');
         }
+    };
+
+    const handleMenuItemAdded = (categoryId, item) => {
+        setMenu((current) => current.map((category) => category.id === categoryId
+            ? { ...category, items: [...category.items, item] } : category));
     };
 
     const handleCreateCategory = async (name) => {
@@ -135,20 +142,21 @@ function RestaurantDetails() {
             });
             setMenu((prevMenu) => [...prevMenu, response.data]);
         } catch (err) {
-            alert('Failed to create category.');
+            notify('Failed to create category.');
         }
     };
 
     if (loading) {
-        return <div>Loading data...</div>;
+        return <div className="restaurant-details-loading" role="status">Loading your restaurant workspace…</div>;
     }
 
     if (error) {
-        return <div>{error}</div>;
+        return <div className="restaurant-details-error" role="alert">{error}</div>;
     }
 
     return (
         <div className="restaurant-details-container">
+            <header className="restaurant-workspace-heading"><span className="eyebrow">RESTAURANT WORKSPACE</span><h1>{editName || 'Your restaurant'}</h1><p className="page-description">The details, opening hours, and dishes that make it yours.</p></header>
             <EditRestaurantInfo
                 editName={editName}
                 setEditName={setEditName}
@@ -168,18 +176,21 @@ function RestaurantDetails() {
             />
 
             <div className="menu-container">
-                <h2>Edit Menu</h2>
+                <h2>Your menu</h2>
+                <p className="editor-description">Organize your dishes into categories. Keep names, prices, and descriptions up to date.</p>
                 {menu.map((category) => (
                     <MenuCategory
                         key={category.id}
                         category={category}
                         handleUpdateCategory={handleUpdateCategory}
                         handleMenuItemUpdate={handleMenuItemUpdate}
+                        handleMenuItemAdded={handleMenuItemAdded}
                     />
                 ))}
                 <div className="add-category">
                     <input
                         type="text"
+                        aria-label="New category name"
                         placeholder="New category name"
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}

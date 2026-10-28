@@ -1,0 +1,31 @@
+import React, { act } from 'react';
+import { createRoot } from 'react-dom/client';
+import RestaurantDetails from './RestaurantDetails';
+import MenuCategory from './RestaurantDetailsCopm/MenuCategory';
+import { dashboardApi } from '../../services/api';
+jest.mock('../../services/api', () => ({ dashboardApi: { get: jest.fn(), post: jest.fn(), patch: jest.fn() } }));
+jest.mock('react-router-dom', () => ({ useParams: () => ({ restaurantId: '3' }) }), { virtual: true });
+jest.mock('./RestaurantDetailsCopm/EditRestaurantInfo', () => () => null);
+jest.mock('./RestaurantDetailsCopm/OpeningHoursEditor', () => () => null);
+jest.mock('./RestaurantDetailsCopm/MenuItemEditor', () => ({ item, categoryId, handleMenuItemUpdate }) => <button onClick={() => handleMenuItemUpdate(categoryId, item.id, { ...item, name: 'Updated', price: '30.00' })}>Test update item</button>);
+jest.mock('./RestaurantDetailsCopm/AddMenuItem', () => ({ handleAddMenuItem }) => <button onClick={() => handleAddMenuItem({ name: 'New', price: '20', description: 'New dish' })}>Test add item</button>);
+let root, host;
+beforeEach(() => { global.IS_REACT_ACT_ENVIRONMENT = true; jest.clearAllMocks(); host = document.createElement('div'); root = createRoot(host); });
+afterEach(async () => { await act(async () => root.unmount()); });
+test('adding an item updates local category without writing read-only nested fields', async () => {
+ const onAdded = jest.fn(), onCategory = jest.fn();
+ dashboardApi.post.mockResolvedValue({ data: { id: 8, name: 'New', price: '20.00' } });
+ await act(async () => root.render(<MenuCategory category={{ id: 1, name: 'Main', items: [] }} handleUpdateCategory={onCategory} handleMenuItemAdded={onAdded} />));
+ await act(async () => [...host.querySelectorAll('button')].find((button) => button.textContent === 'Test add item').click());
+ expect(dashboardApi.post).toHaveBeenCalledWith('/menu/item/', { name: 'New', price: '20', description: 'New dish', category: 1 });
+ expect(onAdded).toHaveBeenCalledWith(1, expect.objectContaining({ id: 8 }));
+ expect(onCategory).not.toHaveBeenCalled();
+});
+test('item edits send only writable Firestore fields', async () => {
+ const item = { id: 2, category: 1, name: 'Old', price: '25.00', description: 'Dish', is_available: true };
+ dashboardApi.get.mockImplementation((url) => Promise.resolve({ data: url.includes('/menu/') ? [{ id: 1, name: 'Main', items: [item] }] : url.includes('opening-houers') ? [] : { name: 'Kitchen', city: 'Haifa', address: 'Main' } }));
+ dashboardApi.patch.mockResolvedValue({ data: { ...item, name: 'Updated', price: '30.00' } });
+ await act(async () => root.render(<RestaurantDetails />));
+ await act(async () => [...host.querySelectorAll('button')].find((button) => button.textContent === 'Test update item').click());
+ expect(dashboardApi.patch).toHaveBeenCalledWith('/menu/item/2/', { name: 'Updated', price: '30.00', description: 'Dish', is_available: true });
+});

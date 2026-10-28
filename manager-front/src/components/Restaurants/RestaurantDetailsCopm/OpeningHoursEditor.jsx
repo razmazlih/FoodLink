@@ -15,7 +15,7 @@ function OpeningHoursEditor({ openingHours, onSave }) {
         setIsEditing(false);
     };
 
-    console.log(openingHours);
+
 
     return (
         <div className="opening-hours">
@@ -29,9 +29,9 @@ function OpeningHoursEditor({ openingHours, onSave }) {
                                     <strong>{day.day_of_week}:</strong>{' '}
                                     {day.opening_time} - {day.closing_time}{' '}
                                     {day.is_open ? (
-                                        <strong>Open</strong>
+                                        <span className="status-badge status-badge--active">Open</span>
                                     ) : (
-                                        <strong>Closed</strong>
+                                        <span className="status-badge">Closed</span>
                                     )}{' '}
                                 </p>
                             </div>
@@ -43,9 +43,9 @@ function OpeningHoursEditor({ openingHours, onSave }) {
                     )}
                     <button
                         className="opening-hours__edit-button"
-                        onClick={() => setIsEditing(true)}
+                        onClick={() => { setEditHours(openingHours.map((day) => ({ ...day }))); setIsEditing(true); }}
                     >
-                        Edit
+                        Edit hours
                     </button>
                 </>
             ) : (
@@ -55,26 +55,26 @@ function OpeningHoursEditor({ openingHours, onSave }) {
                             <label>{day.day_of_week}:</label>
                             <input
                                 className="opening-hours__input"
+                                aria-label={`${day.day_of_week} opening time`}
                                 type="time"
                                 value={day.opening_time}
                                 onChange={(e) =>
                                     setEditHours((prev) => {
                                         const updated = [...prev];
-                                        updated[index].opening_time =
-                                            e.target.value;
+                                        updated[index] = { ...updated[index], opening_time: e.target.value };
                                         return updated;
                                     })
                                 }
                             />
                             <input
                                 className="opening-hours__input"
+                                aria-label={`${day.day_of_week} closing time`}
                                 type="time"
                                 value={day.closing_time}
                                 onChange={(e) =>
                                     setEditHours((prev) => {
                                         const updated = [...prev];
-                                        updated[index].closing_time =
-                                            e.target.value;
+                                        updated[index] = { ...updated[index], closing_time: e.target.value };
                                         return updated;
                                     })
                                 }
@@ -86,8 +86,7 @@ function OpeningHoursEditor({ openingHours, onSave }) {
                                     onChange={(e) => {
                                         setEditHours((prev) => {
                                             const updated = [...prev];
-                                            updated[index].is_open =
-                                                e.target.checked;
+                                            updated[index] = { ...updated[index], is_open: e.target.checked };
                                             return updated;
                                         });
                                     }}
@@ -100,7 +99,7 @@ function OpeningHoursEditor({ openingHours, onSave }) {
                         className="opening-hours__save-button"
                         onClick={handleSave}
                     >
-                        Save
+                        Save hours
                     </button>
                     <button
                         className="opening-hours__cancel-button"

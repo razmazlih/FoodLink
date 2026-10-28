@@ -1,16 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import { notify } from '../Feedback/Feedback';
+import React, { useEffect, useRef, useState } from 'react';
 import { userApi } from '../../services/api';
 import './UsersList.css';
 
-function UsersList() {
+function UsersList({ onEdit }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const deleteDialog = useRef(null);
+  useEffect(() => {
+    if (pendingDelete && deleteDialog.current) deleteDialog.current.showModal();
+    else deleteDialog.current?.close();
+  }, [pendingDelete]);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await userApi.delete(`/users/${encodeURIComponent(pendingDelete.id)}/`);
+      setUsers((current) => current.filter((user) => user.id !== pendingDelete.id));
+      setPendingDelete(null);
+      notify('User deleted successfully.');
+    } catch {
+      notify('Failed to delete user. Please try again.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await userApi.get('/users');
+        const response = await userApi.get('/users/');
         setUsers(response.data);
         setLoading(false);
       } catch (err) {
@@ -32,7 +54,9 @@ function UsersList() {
 
   return (
     <div className="users-list-container">
+      <span className="eyebrow">PEOPLE & ACCESS</span>
       <h1>Users</h1>
+      <p className="page-description">Manage your community and account permissions.</p>
       <table className="users-table">
         <thead>
           <tr>
@@ -44,40 +68,32 @@ function UsersList() {
           </tr>
         </thead>
         <tbody>
+          {users.length === 0 && <tr><td colSpan={5} className="table-empty">No users to show yet.</td></tr>}
           {users.map((user) => (
             <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>
-                <button onClick={() => handleEdit(user.id)}>Edit</button>
-                <button onClick={() => handleDelete(user.id)}>Delete</button>
+              <td data-label="ID">{user.id}</td>
+              <td data-label="Name">{user.name}</td>
+              <td data-label="Email">{user.email}</td>
+              <td data-label="Role"><span className="status-badge">{user.role.replaceAll('_', ' ')}</span></td>
+              <td data-label="Actions">
+                <button onClick={() => onEdit(user.id)}>Edit</button>
+                <button onClick={() => setPendingDelete(user)}>Delete</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <dialog className="workspace-dialog" ref={deleteDialog} onCancel={() => setPendingDelete(null)} aria-labelledby="delete-user-title">
+        <span className="eyebrow">ACCOUNT MANAGEMENT</span>
+        <h2 id="delete-user-title">Delete this user?</h2>
+        <p>This will remove {pendingDelete?.name || pendingDelete?.email || 'this user'} from FoodLink. This action cannot be undone.</p>
+        <div className="dialog-actions">
+          <button type="button" className="secondary-button" onClick={() => setPendingDelete(null)} disabled={deleting} autoFocus>Keep user</button>
+          <button type="button" className="danger-button" onClick={handleDelete} disabled={deleting}>{deleting ? 'Deleting…' : 'Delete user'}</button>
+        </div>
+      </dialog>
     </div>
   );
 }
-
-const handleEdit = (id) => {
-  console.log(`Editing user ${id}`);
-  // Navigate to edit form or open a modal
-};
-
-const handleDelete = async (id) => {
-  if (window.confirm('Are you sure you want to delete this user?')) {
-    try {
-      await userApi.delete(`/users/${id}`); // שימוש ב-userApi למחיקה
-      alert('User deleted successfully.');
-      window.location.reload();
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      alert('Failed to delete user.');
-    }
-  }
-};
 
 export default UsersList;
