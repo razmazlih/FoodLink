@@ -1,0 +1,10 @@
+#root { min-height:100dvh; display:flex; flex-direction:column; }
+#main-content { flex:1; min-width:0; width:100%; }
+#main-content:focus { outline:none; }
+.skip-content-link { position:fixed; inset-block-start:12px; inset-inline-start:20px; transform:translateY(-160%); z-index:9999; background:#173e35; color:#fff; padding:14px 22px; border-radius:12px; text-decoration:none; }
+.skip-content-link:focus { transform:translateY(0); }
+.not-found-page { max-width:680px; margin:70px auto; padding:35px 24px; text-align:center; }
+.not-found-symbol { display:inline-block; font-size:68px; font-weight:800; letter-spacing:-4px; color:#173e35; background:#d6f477; border-radius:30px; padding:15px 30px; transform:rotate(-5deg); }
+.not-found-page h1 { font-size:clamp(28px,5vw,42px); margin:32px 0 15px; }
+.not-found-page p { color:#64736a; }
+.not-found-page a { display:inline-flex; gap:24px; margin-top:18px; border-radius:50px; padding:16px 25px; background:#173e35; color:white; text-decoration:none; font-weight:700; }

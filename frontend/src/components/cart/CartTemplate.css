@@ -1,56 +1,7 @@
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-    cursor: pointer;
-}
-
-.cart-item-strong {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #333;
-    flex-grow: 1;
-}
-
-.cart-item-span {
-    font-size: 1.1rem;
-    color: #555;
-    margin-left: 12px;
-}
-
-[dir="rtl"] .cart-item-span {
-    margin-left: 0;
-    margin-right: 12px;
-}
-
-.cart-item div {
-    display: flex;
-    align-items: center;
-}
-
-[dir="rtl"] .cart-item div {
-    flex-direction: row-reverse;
-}
-
-.cart-item-button {
-    padding: 8px 15px;
-    margin: 0 5px;
-    font-size: 1rem;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.cart-item-button:hover {
-    background-color: #218838;
-    transform: scale(1.1);
-}
+/* Quantity controls stay in a stable, touch-friendly group in both directions. */
+.cart-navbar .cart-item{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;padding:16px;background:var(--paper);border:1px solid var(--line);border-radius:15px;margin-bottom:12px;cursor:default}
+.cart-item>div:first-child{flex:1;min-width:100px;display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+.cart-item>div:last-of-type{display:flex;align-items:center;flex-shrink:0;gap:5px}
+.cart-navbar .cart-item-strong{font-size:15px;font-weight:650;color:var(--ink);overflow-wrap:anywhere}.cart-navbar .cart-item-span{font-size:13px;color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
+.cart-navbar .cart-item-button{min-height:40px;min-width:40px;padding:6px;margin:0;background:#fff;color:var(--ink);border:1px solid #cfd8ce;border-radius:10px;font-size:21px;line-height:1;transform:none;box-shadow:none}.cart-navbar .cart-item-button:hover{background:var(--lime);transform:none}
+.cart-item-error{flex-basis:100%;font-size:12px;color:#963f31;margin:0}

@@ -24,8 +24,12 @@ function Orders() {
     );
 
     useEffect(() => {
+        let active = true;
         fetchAllOrders(userId).then((orders) => {
-            const sortedOrders = orders.sort((a, b) => {
+            if (!active) return;
+            setMyReservations(orders);
+            localStorage.setItem('myReservations', JSON.stringify(orders));
+            const sortedOrders = [...orders].sort((a, b) => {
                 const statusA = a.status?.[a.status.length - 1]?.updated_at;
                 const statusB = b.status?.[b.status.length - 1]?.updated_at;
 
@@ -42,26 +46,20 @@ function Orders() {
             });
             localStorage.setItem('myOrders', JSON.stringify(sortedOrders));
             return setMyOrders(sortedOrders);
-        });
+        }).catch((error) => console.error('Error loading orders:', error));
+        return () => { active = false; };
+    }, [userId, cart]);
+
+    useEffect(() => {
+        let active = true;
         getRestaurantsNamesAndIds().then((response) => {
-            const map = {};
-            response.forEach((restaurant) => {
-                map[restaurant.id] = restaurant.name;
-            });
+            if (!active) return;
+            const map = Object.fromEntries(response.map(({ id, name }) => [id, name]));
             setRestaurantMap(map);
             localStorage.setItem('restaurantMap', JSON.stringify(map));
-        });
-
-        if (userId) {
-            fetchAllOrders(userId).then((response) => {
-                setMyReservations(response);
-                localStorage.setItem(
-                    'myReservations',
-                    JSON.stringify(response)
-                );
-            });
-        }
-    }, [userId, cart]);
+        }).catch((error) => console.error('Error loading restaurant names:', error));
+        return () => { active = false; };
+    }, []);
 
     const showingOrders = myOrders.map((order) => (
         <SingleOrder

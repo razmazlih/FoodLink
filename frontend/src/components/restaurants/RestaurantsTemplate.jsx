@@ -11,6 +11,7 @@ function RestaurantsTemplate({ restaurant, openStatus, updateOpenStatuses }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const isOpenNow = openStatus[restaurant.id] || { status: 'close' };
+    const [photoFailed, setPhotoFailed] = useState(false);
     const [hasActiveReservation, setHasActiveReservation] = useState(false);
     const { userId } = useContext(AuthContext);
     const { updateCart, createNewCart } = useContext(CartContext);
@@ -95,11 +96,19 @@ function RestaurantsTemplate({ restaurant, openStatus, updateOpenStatuses }) {
             onClick={handleContainerClick}
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && handleContainerClick()}
+            onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleContainerClick();
+                }
+            }}
         >
             <img
                 className="restaurant-photo"
-                src={restaurant.photo_url}
+                src={!photoFailed && restaurant.photo_url ? restaurant.photo_url : `${process.env.PUBLIC_URL}/meal-illustration.svg`}
+                onError={() => setPhotoFailed(true)}
+                loading="lazy"
+                decoding="async"
                 alt={restaurant.name}
             />
             <div className="restaurants-info">

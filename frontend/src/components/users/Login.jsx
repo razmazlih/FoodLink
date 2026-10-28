@@ -13,10 +13,11 @@ function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleSubmit = () => {
+    const handleSubmit = (event) => {
+        event.preventDefault();
         setError('');
         userCredentials({
-            username: username.toLowerCase(),
+            email: username.trim().toLowerCase(),
             password,
         })
             .then((response) => {
@@ -28,43 +29,40 @@ function Login() {
             });
     };
 
-    const handlePressEnter = (event) => {
-        if (event.key === 'Enter') {
-            handleSubmit();
-        }
-    };
-
     return (
         <div className="login-container">
+            <span className="auth-mark" aria-hidden="true">✳</span>
+            <span className="section-eyebrow">{t('welcomeBack')}</span>
             <h1 className="login-title">{t('login')}</h1>
-            <div className="login-form">
-                <input
+            <p className="auth-description">{t('loginLead')}</p>
+            <form className="login-form" onSubmit={handleSubmit}>
+                <label htmlFor="login-email">{t('email')}</label>
+                <input id="login-email" name="email" autoComplete="email"
                     className="login-input"
-                    type="text"
-                    placeholder={t('username')}
+                    type="email"
+                    placeholder={t('email')} aria-label={t('email')}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    onKeyDown={handlePressEnter}
                 />
-                <input
+                <label htmlFor="login-password">{t('password')}</label>
+                <input id="login-password" name="password" autoComplete="current-password"
                     className="login-input"
                     type="password"
-                    placeholder={t('password')}
+                    placeholder={t('password')} aria-label={t('password')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={handlePressEnter}
                 />
-                <button className="login-button" onClick={handleSubmit}>
+                <button className="login-button" type="submit">
                     {t('login')}
                 </button>
-                {error && <div className="error-message-login">{error}</div>}
+                {error && <div className="error-message-login" role="alert">{error}</div>}
                 <p className="login-text">
                     {t('noAccount')}{' '}
                     <Link to="/register" className="login-link">
                         {t('register')}
                     </Link>
                 </p>
-            </div>
+            </form>
         </div>
     );
 }

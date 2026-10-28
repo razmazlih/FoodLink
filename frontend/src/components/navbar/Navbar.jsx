@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { CartContext } from '../../context/CartContext';
@@ -12,11 +12,11 @@ const Navbar = ({ changeLanguage }) => {
     const { showing, setShowing } = useContext(CartContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { t, i18n } = useTranslation();
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 768);
+            setIsMobile(window.innerWidth <= 768);
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -38,9 +38,9 @@ const Navbar = ({ changeLanguage }) => {
 
     return (
         <>
-            <div className="navbar">
+            <nav className="navbar" aria-label={t('mainNavigation')}>
                 <div className="navbar-header">
-                    <h1 className="navbar-title">Food Link</h1>
+                    <Link to="/" className="navbar-title" onClick={closeMenu}>FoodLink<span aria-hidden="true">✳</span></Link>
                     
                     {/* כפתור שינוי שפה חיצוני - רק במסכים גדולים */}
                     {!isMobile && (
@@ -51,11 +51,11 @@ const Navbar = ({ changeLanguage }) => {
                         </div>
                     )}
 
-                    <button className="navbar-toggle" onClick={toggleMenu}>
+                    <button className="navbar-toggle" onClick={toggleMenu} aria-label={t('toggleMenu')} aria-expanded={isMenuOpen} aria-controls="customer-navigation">
                         ☰
                     </button>
                 </div>
-                <ul className={`navbar-list ${isMenuOpen ? 'open' : ''}`}>
+                <ul id="customer-navigation" className={`navbar-list ${isMenuOpen ? 'open' : ''}`}>
                     {[
                         { name: t('home'), link: '/' },
                         { name: t('about'), link: '/about' },
@@ -63,9 +63,9 @@ const Navbar = ({ changeLanguage }) => {
                         { name: t('restaurants'), link: '/restaurants' },
                     ].map((item, index) => (
                         <li key={index} className="navbar-item">
-                            <Link to={item.link} className="navbar-link" onClick={closeMenu}>
+                            <NavLink to={item.link} end={item.link === '/'} className="navbar-link" onClick={closeMenu}>
                                 {item.name}
-                            </Link>
+                            </NavLink>
                         </li>
                     ))}
 
@@ -76,10 +76,12 @@ const Navbar = ({ changeLanguage }) => {
                                     {t('myOrders')}
                                 </Link>
                             </li>
+                            <li className="navbar-item"><Link to="/my-addresses" className="navbar-link" onClick={closeMenu}>{t('myAddresses')}</Link>
+                            </li>
                             <li className="navbar-item">
-                                <Link to="#" className="navbar-link" onClick={() => { setShowing(!showing); closeMenu(); }}>
+                                <button type="button" className="navbar-link" aria-expanded={showing} onClick={() => { setShowing(!showing); closeMenu(); }}>
                                     {t('myCart')}
-                                </Link>
+                                </button>
                             </li>
                             <li className="navbar-item">
                                 <Link to="/login" className="navbar-link" onClick={() => { handleLogout(); closeMenu(); }}>
@@ -105,7 +107,7 @@ const Navbar = ({ changeLanguage }) => {
                     )}
                 </ul>
                 {showing && <CartNavbar />}
-            </div>
+            </nav>
             <div className={`navbar-space ${isMenuOpen && 'active'} ${isLoggedIn && 'login'}`}></div>
         </>
     );

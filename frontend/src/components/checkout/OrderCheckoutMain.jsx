@@ -6,11 +6,14 @@ import { fetchOrder } from '../../services/OrderLine/order/api';
 import OrderCheckoutItem from './OrderCheckoutItem';
 import OrderSummary from './OrderSummary';
 import './OrderCheckout.css';
+import Addresses from '../users/Addresses';
+import { AuthContext } from '../../context/AuthContext';
 
-function OrderCheckoutMain() {
+function OrderCheckoutSession() {
     const { t, i18n } = useTranslation();
     const { orderId } = useParams();
     const { cart } = useContext(CartContext);
+    const [deliveryAddress, setDeliveryAddress] = useState(null);
     const [myOrder, setMyOrder] = useState({ items: [], totalPrice: 0 });
 
     useEffect(() => {
@@ -21,7 +24,7 @@ function OrderCheckoutMain() {
                 id: order.id,
                 items: order.items.map((item) => ({
                     ...item,
-                    name: mapItemName[item.id] || t('loading'),
+                    name: item.name || mapItemName[item.menu_item_id] || t('loading'),
                 })),
                 orderedAt: order.ordered_at,
                 totalPrice: order.total_price,
@@ -53,9 +56,14 @@ function OrderCheckoutMain() {
                 {formatDate(myOrder.orderedAt)}
             </p>
             <OrderCheckoutItem items={cart} />
-            <OrderSummary totalPrice={myOrder.totalPrice} myOrder={myOrder} />
+            <Addresses key={orderId} selectedId={deliveryAddress?.id} onSelect={setDeliveryAddress} />
+            <OrderSummary deliveryAddress={deliveryAddress} totalPrice={myOrder.totalPrice} myOrder={myOrder} />
         </div>
     );
 }
 
-export default OrderCheckoutMain;
+export default function OrderCheckoutMain() {
+    const { userId } = useContext(AuthContext) || {};
+    const { orderId } = useParams();
+    return <OrderCheckoutSession key={`${userId || 'guest'}:${orderId}`} />;
+}

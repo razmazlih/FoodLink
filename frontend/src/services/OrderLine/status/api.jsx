@@ -13,5 +13,6 @@ export const updateCartStatus = async (orderId, status) => {
         return data;
     } catch (error) {
         console.error('Error checkout cart:', error);
+        throw error;
     }
 };

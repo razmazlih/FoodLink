@@ -1,3 +1,4 @@
+import { getAccessToken } from '../../../firebase';
 import { WEBSOCLET_ORDERLINE_URL } from '../../../config';
 
 class WebSocketService {
@@ -15,22 +16,36 @@ class WebSocketService {
             return;
         }
 
-        this.socket = new WebSocket(
+        const socket = new WebSocket(
             `${WEBSOCLET_ORDERLINE_URL}/ws/order-status/${orderId}`
         );
 
-        this.socket.onmessage = (event) => {
+        this.socket = socket;
+
+        socket.onopen = async () => {
+            try {
+                const token = await getAccessToken();
+                if (this.socket !== socket) return;
+                if (!token) { socket.close(); return; }
+                socket.send(JSON.stringify({ type: 'auth', token }));
+            } catch (error) {
+                console.error('Unable to authenticate order updates');
+                socket.close();
+            }
+        };
+
+        socket.onmessage = (event) => {
             if (onMessageCallback) {
                 onMessageCallback(event.data);
             }
         };
 
-        this.socket.onerror = (error) => {
+        socket.onerror = (error) => {
             console.error('WebSocket Error:', error);
         };
 
-        this.socket.onclose = () => {
-            this.socket = null;
+        socket.onclose = () => {
+            if (this.socket === socket) this.socket = null;
         };
     }
 

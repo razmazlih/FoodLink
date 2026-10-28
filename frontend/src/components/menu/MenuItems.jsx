@@ -26,6 +26,7 @@ function MenuItems({ menu }) {
     return (
         <div className="menu-items-container">
             <h2 className="menu-title">{t('menu')}</h2>
+            {menu.length === 0 && <div className="menu-empty-state" role="status"><span aria-hidden="true">✳</span><h3>{t('menuEmptyTitle')}</h3><p>{t('menuEmptyDescription')}</p></div>}
             {menu.map((category) => (
                 <div key={category.id} className="category-container">
                     <h3 className="category-title">{category.name}</h3>

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CartContext } from '../../context/CartContext';
 import CartTemplate from './CartTemplate';
@@ -10,6 +10,21 @@ function CartNavbar() {
     const { cart, setShowing, orderId } = useContext(CartContext);
     const navigate = useNavigate();
     const location = useLocation();
+    const closeButton = useRef(null);
+    const total = cart.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
+
+    useEffect(() => {
+        const previous = document.activeElement;
+        closeButton.current?.focus();
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') setShowing(false);
+        };
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+            previous?.focus();
+        };
+    }, [setShowing]);
 
     const handleClickCheckout = () => {
         setShowing(false);
@@ -17,10 +32,10 @@ function CartNavbar() {
     };
 
     return (
-        <div className="cart-navbar">
-            <h2 className="cart-navbar-title">{t('myCart')}</h2>
+        <section className="cart-navbar" role="dialog" aria-labelledby="cart-heading">
+            <h2 id="cart-heading" className="cart-navbar-title">{t('myCart')}</h2>
             {!cart.length && (
-                <p className="cart-navbar-pas">{t('emptyCart')}</p>
+                <div className="cart-empty-state"><span aria-hidden="true">↗</span><p className="cart-navbar-pas">{t('emptyCart')}</p><button className="cart-browse-button" onClick={() => { setShowing(false); navigate('/restaurants'); }}>{t('viewRestaurants')}</button></div>
             )}
 
             <div className="cart-items-container">
@@ -28,6 +43,7 @@ function CartNavbar() {
                     <CartTemplate key={item.id} item={item} />
                 ))}
             </div>
+            {cart.length > 0 && <div className="cart-total-row"><span>{t('cartTotal')}</span><strong>{total.toFixed(2)}₪</strong></div>}
             {cart.length > 0 && !location.pathname.includes('/checkout') && (
                 <button
                     className="cart-button"
@@ -36,10 +52,10 @@ function CartNavbar() {
                     {t('checkout')}
                 </button>
             )}
-            <button className="cart-button" onClick={() => setShowing(false)}>
+            <button ref={closeButton} className="cart-button cart-close-button" onClick={() => setShowing(false)}>
                 {t('close')}
             </button>
-        </div>
+        </section>
     );
 }
 

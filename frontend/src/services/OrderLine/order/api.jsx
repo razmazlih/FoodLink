@@ -50,3 +50,6 @@ export const createOrder = async (userId, restaurantId) => {
         throw error;
     }
 };
+
+export const saveDeliveryAddress = async (orderId, delivery_address) =>
+    (await axios.put(`${API_ORDERLINE_URL}/orders/${orderId}/`, { delivery_address })).data;

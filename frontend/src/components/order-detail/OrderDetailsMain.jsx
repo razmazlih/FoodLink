@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchOrder } from '../../services/OrderLine/order/api';
-import { getMenuItemNameById } from '../../services/DishBoard/menu/api';
+import { resolveMenuItemNames } from '../../services/DishBoard/menu/names';
 import { updateCartStatus } from '../../services/OrderLine/status/api';
 import websocketInstance from '../../services/OrderLine/status/websocket';
 import './OrderDetails.css';
+import { addressText } from '../users/Addresses';
 
 function OrderDetailsMain() {
     const { t, i18n } = useTranslation();
@@ -17,11 +18,13 @@ function OrderDetailsMain() {
     const [lastUpdated, setLastUpdated] = useState(null);
 
     useEffect(() => {
+        let active = true;
         const loadOrderDetails = async () => {
             try {
                 const order = await fetchOrder(orderId);
                 if (!order || !order.items) throw new Error("Invalid order data");
 
+                if (!active) return;
                 setOrderDetails(order);
                 if (order.status.length > 0) {
                     const lastStatus = order.status[order.status.length - 1];
@@ -29,15 +32,8 @@ function OrderDetailsMain() {
                     setLastUpdated(new Date(lastStatus.updated_at));
                 }
 
-                // טעינת שמות הפריטים לפי menu_item_id
-                const fetchedNames = {};
-                for (const item of order.items) {
-                    if (!item.name) {
-                        fetchedNames[item.menu_item_id] = await getMenuItemNameById(item.menu_item_id);
-                    }
-                }
-
-                setItemNames((prev) => ({ ...prev, ...fetchedNames }));
+                const fetchedNames = await resolveMenuItemNames(order.items);
+                if (active) setItemNames((prev) => ({ ...prev, ...fetchedNames }));
             } catch (error) {
                 console.error("Error fetching order details:", error);
             }
@@ -45,14 +41,12 @@ function OrderDetailsMain() {
 
         loadOrderDetails();
 
-        // התחברות ל-WebSocket להאזנה לשינויים בסטטוס
-        websocketInstance.connect(orderId, (newStatus, updatedAt) => {
-            console.log("📡 עדכון סטטוס:", newStatus, "🕒", updatedAt);
-            setLatestStatus(newStatus);
-            setLastUpdated(new Date(updatedAt));
-        });
+        // The server sends an order-specific plain-text status without a timestamp.
+        // Reload this order to obtain its authoritative status and timestamp.
+        websocketInstance.connect(orderId, loadOrderDetails);
 
         return () => {
+            active = false;
             websocketInstance.disconnect();
         };
     }, [orderId]);
@@ -99,6 +93,7 @@ function OrderDetailsMain() {
                 )}
             </div>
 
+            {orderDetails.delivery_address && <section><h2>{t('deliveryAddress')}</h2><p>{orderDetails.delivery_address.label} · {addressText(orderDetails.delivery_address)}</p></section>}
             <div className="order-details-page-items">
                 {orderDetails.items.length > 0 ? (
                     orderDetails.items.map((item) => (

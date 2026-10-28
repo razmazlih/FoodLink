@@ -17,7 +17,7 @@ function RestaurantSearch({ searchTerm, setSearchTerm }) {
         <div className="restaurant-search">
             <input
                 type="text"
-                placeholder={t('searchRestaurants')}
+                placeholder={t('searchRestaurants')} aria-label={t('searchRestaurants')}
                 value={tempSearchTerm}
                 onChange={(e) => setTempSearchTerm(e.target.value)}
             />

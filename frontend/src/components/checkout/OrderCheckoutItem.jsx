@@ -1,45 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getMenuItemNameById } from '../../services/DishBoard/menu/api';
+import { readMenuItemNames, resolveMenuItemNames } from '../../services/DishBoard/menu/names';
 
 function OrderCheckoutItem({ items }) {
     const { t } = useTranslation();
     const [mapItemName, setMapItemName] = useState(
-        JSON.parse(localStorage.getItem('cartNames')) || {}
+        readMenuItemNames()
     );
 
     useEffect(() => {
-        const fetchDetailsForLoadingItems = async () => {
-            const cartNames =
-                JSON.parse(localStorage.getItem('cartNames')) || {};
-
-            const itemsToFetch = items.filter(
-                (item) => !cartNames[item.menu_item_id]
-            );
-
-            if (itemsToFetch.length === 0) return;
-
-            const fetchedNames = {};
-            try {
-                for (const item of itemsToFetch) {
-                    const response = await getMenuItemNameById(
-                        item.menu_item_id
-                    );
-                    fetchedNames[item.menu_item_id] = response;
-                }
-
-                const updatedCartNames = { ...cartNames, ...fetchedNames };
-                localStorage.setItem(
-                    'cartNames',
-                    JSON.stringify(updatedCartNames)
-                );
-                setMapItemName(updatedCartNames);
-            } catch (error) {
-                console.error('Error fetching menu item name:', error);
-            }
-        };
-
-        fetchDetailsForLoadingItems();
+        let active = true;
+        resolveMenuItemNames(items).then((names) => {
+            if (active) setMapItemName({ ...readMenuItemNames(), ...names });
+        }).catch((error) => console.error('Error fetching menu item names:', error));
+        return () => { active = false; };
     }, [items]);
 
     return (

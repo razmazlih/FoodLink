@@ -1,65 +1,25 @@
+import { Link } from 'react-router-dom';
 import FirstContent from './FirstContent';
-import TemplateContent from './TemplateContent';
 import { useTranslation } from 'react-i18next';
 import './HomeMain.css';
 
 function HomeMain() {
     const { t } = useTranslation();
-
-    const myItems = [
-        {
-            topic: t('restaurantDiscovery'),
-            content: t('exploreRestaurants'),
-        },
-        {
-            topic: t('orderTracking'),
-            content: t('stayUpdated'),
-        },
-        {
-            topic: t('menuBrowsing'),
-            content: t('viewMenus'),
-        },
+    const features = [
+        { icon: '↗', title: 'restaurantDiscovery', text: 'exploreRestaurants' },
+        { icon: '≋', title: 'menuBrowsing', text: 'viewMenus' },
+        { icon: '◷', title: 'orderTracking', text: 'stayUpdated' },
     ];
-
-    const contentToRender = [
-        {
-            topHeader: <h3 className="first-content-h3">{t('discoverFoodLink')}</h3>,
-            mainHeader: <h2 className="first-content-h2">{t('yourGateway')}</h2>,
-            paragraph: (
-                <p className="first-content-p">
-                    {t('foodLinkIntro')}
-                </p>
-            ),
-            button: t('aboutProject'),
-            link: '/about'
-        },
-        {
-            topHeader: <h3 className="first-content-h3">{t('deliciousDeliveries')}</h3>,
-            mainHeader: <h2 className="first-content-h2">{t('orderFromBest')}</h2>,
-            paragraph: myItems.map((item, index) => (
-                <li className="first-content-li" key={index}>
-                    <strong>{item.topic}:</strong> {item.content}
-                </li>
-            )),
-        },
-    ];
-
-    const mapItems = contentToRender.map((content, index) => (
-        <TemplateContent
-            key={index}
-            topHeader={content.topHeader}
-            mainHeader={content.mainHeader}
-            paragraph={content.paragraph}
-            button={content.button}
-        />
-    ));
-
     return (
         <div className="home-main">
             <FirstContent />
-            {mapItems}
+            <section className="home-discover">
+                <div className="home-section-heading"><div><span className="section-eyebrow">{t('discoverFoodLink')}</span><h2>{t('yourGateway')}</h2></div><Link to="/restaurants">{t('restaurants')} <span aria-hidden="true">↗</span></Link></div>
+                <p className="home-intro">{t('foodLinkIntro')}</p>
+                <div className="home-feature-grid">{features.map((feature, index) => <article className="home-feature" key={feature.title}><div className="feature-top"><span className="feature-icon" aria-hidden="true">{feature.icon}</span><span className="feature-number">0{index + 1}</span></div><h3>{t(feature.title)}</h3><p>{t(feature.text)}</p></article>)}</div>
+            </section>
+            <section className="home-bottom-banner"><div><span className="section-eyebrow">{t('heroCaptionSmall')}</span><h2>{t('orderFromBest')}</h2></div><Link to="/restaurants">{t('orderNow')} <span aria-hidden="true">↗</span></Link></section>
         </div>
     );
 }
-
 export default HomeMain;

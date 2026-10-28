@@ -17,8 +17,7 @@ function MenuItem({ menuItem }) {
     }, [cart, checkInCart, menuItem.id]);
 
     const handleAddToCart = () => {
-        setIsInCart(true);
-        addToCart(menuItem);
+        if (menuItem.is_available !== false) addToCart(menuItem);
     };
 
     const userLogin = (
@@ -28,9 +27,9 @@ function MenuItem({ menuItem }) {
     );
 
     const inCart = (
-        <span className="added-to-cart" onClick={() => setShowing(true)}>
-            {t('added')}
-        </span>
+        <button type="button" className="added-to-cart" onClick={() => setShowing(true)}>
+            <span aria-hidden="true">✓ </span>{t('added')}
+        </button>
     );
 
     const handleIsLoginIsInCart = userId ? (
@@ -40,9 +39,9 @@ function MenuItem({ menuItem }) {
             userLogin
         )
     ) : (
-        <p className="login-prompt-menu" onClick={() => navigate('/login')}>
+        <button type="button" className="login-prompt-menu" onClick={() => navigate('/login')}>
             {t('pleaseLogin')}
-        </p>
+        </button>
     );
 
     return (
@@ -52,7 +51,9 @@ function MenuItem({ menuItem }) {
                 <span className="price">{menuItem.price}₪</span>
             </div>
             <p className="menu-item-description">{menuItem.description}</p>
-            {handleIsLoginIsInCart}
+            {menuItem.is_available === false ? (
+                <button type="button" className="add-to-cart-btn" disabled>{t('menuItemUnavailable')}</button>
+            ) : handleIsLoginIsInCart}
         </li>
     );
 }

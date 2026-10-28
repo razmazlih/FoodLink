@@ -43,8 +43,8 @@ export const CartContextProvider = ({ children }) => {
                     id: responeData.id,
                     orderId: responeData.order_id,
                     menu_item_id: responeData.menu_item_id,
-                    name: item.name,
-                    price: item.price,
+                    name: responeData.name || item.name,
+                    price: responeData.price,
                     quantity: responeData.quantity,
                 };
                 const newCart = [...cart, editedResponse];
@@ -83,21 +83,7 @@ export const CartContextProvider = ({ children }) => {
                 localStorage.setItem('cartItems', JSON.stringify(updatedCart));
                 updatedCart.length === 0 && setShowing(false);
             } else {
-                updateQuantity(showItem.id, showItem.quantity - 1);
-
-                await updateQuantityById(showItem.id, showItem.quantity - 1);
-                let updatedItem;
-                const updatedCart = cart.map((item) => {
-                    return item.id === showItem.id
-                        ? (updatedItem = {
-                              ...item,
-                              quantity: item.quantity - 1,
-                          })
-                        : item;
-                });
-                localStorage.setItem('cartItems', JSON.stringify(updatedCart));
-                setCart(updatedCart);
-                return updatedItem;
+                return await updateQuantity(showItem.id, showItem.quantity - 1);
             }
         } catch (error) {
             console.error('Error updating the cart:', error);

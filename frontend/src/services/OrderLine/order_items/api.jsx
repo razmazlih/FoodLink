@@ -12,6 +12,7 @@ export const addItemToCart = async (order) => {
         return data;
     } catch (error) {
         console.error('Error adding item to cart:', error);
+        throw error;
     }
 };
 
@@ -23,6 +24,7 @@ export const updateQuantityById = async (itemId, newQuantity) => {
         return data;
     } catch (error) {
         console.error('Error updating quantity:', error);
+        throw error;
     }
 };
 
@@ -31,5 +33,6 @@ export const deleteItemFromCart = async (itemId) => {
         await axios.delete(`${API_ORDERLINE_URL}/order-item/${itemId}/`);
     } catch (error) {
         console.error('Error deleting item from server:', error);
+        throw error;
     }
 };
