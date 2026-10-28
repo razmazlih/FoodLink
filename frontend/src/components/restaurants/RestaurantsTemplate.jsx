@@ -1,101 +1,136 @@
-import { useContext, useEffect, useState } from 'react';
+
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isRestaurantOpen } from '../../services/DishBoard/restaurants/api';
 import { useNavigate } from 'react-router-dom';
+
+import { isRestaurantOpen } from '../../services/DishBoard/restaurants/api';
 import { fetchAllOrders, fetchOrder } from '../../services/OrderLine/order/api';
 import { AuthContext } from '../../context/AuthContext';
 import { CartContext } from '../../context/CartContext';
+
 import './RestaurantsTemplate.css';
 
-function RestaurantsTemplate({ restaurant, openStatus, updateOpenStatuses }) {
+function RestaurantsTemplate({
+    restaurant,
+    openStatus,
+    updateOpenStatuses,
+}) {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const isOpenNow = openStatus[restaurant.id] || { status: 'close' };
-    const [photoFailed, setPhotoFailed] = useState(false);
-    const [hasActiveReservation, setHasActiveReservation] = useState(false);
+
     const { userId } = useContext(AuthContext);
-    const { updateCart, createNewCart } = useContext(CartContext);
-    const [myReservations, setMyReservations] = useState(
-        JSON.parse(localStorage.getItem('myReservations')) || []
-    );
-    const { i18n } = useTranslation();
+    const { orderId, updateCart, createNewCart } = useContext(CartContext);
+
+    const [photoFailed, setPhotoFailed] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState(false);
+
+    const requestInFlight = useRef(false);
+
+    const isOpenNow = openStatus[restaurant.id] || {
+        is_open: false,
+    };
 
     useEffect(() => {
+        let active = true;
+
         isRestaurantOpen(restaurant.id)
-            .then((data) => {
-                updateOpenStatuses(data, restaurant.id);
+            .then((status) => {
+                if (active) {
+                    updateOpenStatuses(status, restaurant.id);
+                }
             })
-            .catch((error) => {
-                console.error('Error fetching opening hours:', error);
+            .catch((err) => {
+                console.error('Failed to load opening hours:', err);
             });
+
+        return () => {
+            active = false;
+        };
     }, [restaurant.id, updateOpenStatuses]);
 
+    const handleContainerClick = async () => {
+        // Prevent repeated clicks from starting duplicate requests.
+        if (requestInFlight.current) return;
 
-    useEffect(() => {
-        document.documentElement.lang = i18n.language;
-        document.documentElement.dir = i18n.language === 'he' ? 'rtl' : 'ltr';
-    }, [i18n.language]);
+        requestInFlight.current = true;
+        setBusy(true);
+        setError(false);
 
-    useEffect(() => {
-        const checkReservation = async (restaurantId, userId) => {
-            try {
-                const isReservationFound = myReservations.some((order) => {
+        try {
+            if (userId) {
+                // Always read current orders from the server.
+                const orders = await fetchAllOrders(userId);
+
+                const drafts = orders.filter((order) => {
                     return (
-                        order.restaurant_id === restaurantId &&
-                        order.user_id === Number(userId) &&
+                        order.user_id === userId &&
+                        String(order.restaurant_id) ===
+                            String(restaurant.id) &&
+                        Array.isArray(order.status) &&
                         order.status.length === 0
                     );
                 });
-                setHasActiveReservation(isReservationFound);
-            } catch (error) {
-                console.error('Error checking reservation:', error);
-            }
-        };
 
-        if (userId) {
-            checkReservation(restaurant.id, userId);
-        }
-    }, [restaurant.id, userId, myReservations]);
-
-    useEffect(() => {
-        if (userId) {
-            fetchAllOrders(userId).then((response) => {
-                setMyReservations(response);
-                localStorage.setItem(
-                    'myReservations',
-                    JSON.stringify(response)
+                // Prefer the currently selected draft.
+                let draft = drafts.find(
+                    (order) => String(order.id) === String(orderId)
                 );
-            });
-        }
-    }, [userId]);
 
-    async function handleContainerClick() {
-        if (userId) {
-            if (hasActiveReservation) {
-                const reservation = myReservations.find((order) => {
-                    return (
-                        order.restaurant_id === restaurant.id &&
-                        order.status.length === 0
-                    );
-                });
+                // Otherwise, reuse the newest existing draft.
+                if (!draft && drafts.length > 0) {
+                    draft = drafts.reduce((latest, current) => {
+                        if (!latest) return current;
 
-                if (reservation) {
-                    const order = await fetchOrder(reservation.id);
-                    updateCart(order.items, order.id);
+                        return Number(current.id) > Number(latest.id)
+                            ? current
+                            : latest;
+                    }, null);
                 }
-            } else {
-                createNewCart(userId, restaurant.id);
+
+                if (draft) {
+                    const existingOrder = await fetchOrder(draft.id);
+
+                    updateCart(
+                        existingOrder.items || [],
+                        existingOrder.id
+                    );
+                } else {
+                    // Wait for creation before opening the menu.
+                    await createNewCart(userId, restaurant.id);
+                }
             }
+
+            navigate(`/restaurants/${restaurant.id}`);
+        } catch (err) {
+            console.error('Failed to prepare restaurant cart:', err);
+            setError(true);
+        } finally {
+            requestInFlight.current = false;
+            setBusy(false);
         }
-        navigate(`/restaurants/${restaurant.id}`);
-    }
+    };
+
+    const getOpeningMessage = () => {
+        if (isOpenNow.is_open && isOpenNow.closes_at) {
+            return `${t('closesAt')} ${isOpenNow.closes_at.slice(0, 5)}`;
+        }
+
+        if (isOpenNow.next_day && isOpenNow.opens_at) {
+            return `${t('opensAt')} ${t(isOpenNow.next_day)}, ${isOpenNow.opens_at.slice(0, 5)}`;
+        }
+
+        return t('restaurantNotUpdated');
+    };
 
     return (
         <div
             className="restaurant-card"
             onClick={handleContainerClick}
             role="button"
-            tabIndex={0}
+            tabIndex={busy ? -1 : 0}
+            aria-busy={busy}
+            aria-disabled={busy}
             onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
@@ -105,14 +140,20 @@ function RestaurantsTemplate({ restaurant, openStatus, updateOpenStatuses }) {
         >
             <img
                 className="restaurant-photo"
-                src={!photoFailed && restaurant.photo_url ? restaurant.photo_url : `${process.env.PUBLIC_URL}/meal-illustration.svg`}
+                src={
+                    !photoFailed && restaurant.photo_url
+                        ? restaurant.photo_url
+                        : `${process.env.PUBLIC_URL}/meal-illustration.svg`
+                }
                 onError={() => setPhotoFailed(true)}
                 loading="lazy"
                 decoding="async"
                 alt={restaurant.name}
             />
+
             <div className="restaurants-info">
                 <h3>{restaurant.name}</h3>
+
                 <p className="tooltip-status">
                     <span
                         className={`restaurant-status ${
@@ -121,18 +162,24 @@ function RestaurantsTemplate({ restaurant, openStatus, updateOpenStatuses }) {
                     >
                         {isOpenNow.is_open ? t('open') : t('closed')}
                     </span>
+
                     <span className="tooltip-text">
-                        {isOpenNow.is_open
-                            ? `${t('closesAt')} ${isOpenNow.closes_at.slice(0, 5)}`
-                            : isOpenNow.next_day
-                            ? `${t('opensAt')} ${t(isOpenNow.next_day)}, ${isOpenNow.opens_at.slice(0, 5)}`
-                            : t('restaurantNotUpdated')}
+                        {getOpeningMessage()}
                     </span>
                 </p>
             </div>
+
             <p>
                 {restaurant.address}, {restaurant.city}
             </p>
+
+            {busy && (
+                <p role="status">{t('loading')}</p>
+            )}
+
+            {error && (
+                <p role="alert">{t('orderActionFailed')}</p>
+            )}
         </div>
     );
 }

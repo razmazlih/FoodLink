@@ -97,14 +97,17 @@ export const CartContextProvider = ({ children }) => {
         localStorage.setItem('cartItems', JSON.stringify(items));
     };
 
-    const createNewCart = (userId, restaurantId) => {
-        createOrder(userId, restaurantId).then((order) => {
-            setOrderId(order.id);
-            localStorage.setItem('orderId', order.id);
-            localStorage.removeItem('cartItems');
-            setCart([]);
-        });
+    
+    const createNewCart = async (userId, restaurantId) => {
+        const order = await createOrder(userId, restaurantId);
+
+        // Update both React state and localStorage together.
+        updateCart([], order.id);
+
+        // Return only after the server successfully creates the order.
+        return order;
     };
+
 
     const checkInCart = (menuItemId) => {
         return cart.some((item) => item.menu_item_id === menuItemId);
