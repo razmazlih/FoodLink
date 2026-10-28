@@ -16,3 +16,8 @@ app.add_middleware(
     allow_headers=['*'],
 )
 app.include_router(router)
+
+
+@app.get('/healthz')
+def healthz():
+    return {'status': 'ok', 'service': 'orderline'}

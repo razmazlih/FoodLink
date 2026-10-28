@@ -14,6 +14,15 @@ from firebase_main import app
 from foodlink_core.firebase import AuthenticationError
 
 
+class FirebaseHealthTests(unittest.TestCase):
+    @patch('foodlink_core.firebase.initialize', side_effect=AssertionError('Health must not initialize Firebase'))
+    def test_health_is_public_and_independent_of_firebase(self, initialize):
+        response = TestClient(app).get('/healthz', headers={'Authorization': 'Bearer invalid'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'status': 'ok', 'service': 'orderline'})
+        initialize.assert_not_called()
+
+
 def identity(uid='customer', role='customer'):
     return SimpleNamespace(uid=uid, email=f'{uid}@example.test', role=role, claims={})
 

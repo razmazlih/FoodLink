@@ -1,5 +1,6 @@
 """Lazy Firebase Admin initialization and verified server identities."""
 from dataclasses import dataclass
+import json
 import os
 import re
 from threading import RLock
@@ -73,13 +74,32 @@ def configuration():
         _emulator_host('FIRESTORE_EMULATOR_HOST', store_host)
         if not project.startswith('demo-'):
             raise FirebaseConfigurationError('Emulators require a demo- Firebase project to prevent mixing test tokens and real data')
+        if os.getenv('FIREBASE_SERVICE_ACCOUNT_JSON', '').strip():
+            raise FirebaseConfigurationError('Remove FIREBASE_SERVICE_ACCOUNT_JSON when using emulators')
     elif project.startswith('demo-'):
         raise FirebaseConfigurationError('A demo- project requires both Firebase emulators')
     return project, auth_host, store_host
 
 
+def _cloud_credential(project):
+    """Use a server-only service-account JSON secret when provided, otherwise ADC."""
+    secret = os.getenv('FIREBASE_SERVICE_ACCOUNT_JSON', '').strip()
+    if not secret:
+        return credentials.ApplicationDefault()
+    try:
+        account = json.loads(secret)
+        if (not isinstance(account, dict) or account.get('type') != 'service_account'
+                or account.get('project_id') != project):
+            raise ValueError()
+        return credentials.Certificate(account)
+    except (ValueError, TypeError, KeyError):
+        # SDK parse errors can contain credential fields. Do not expose their text
+        # or chained exceptions in server logs or API responses.
+        raise FirebaseConfigurationError('Invalid FIREBASE_SERVICE_ACCOUNT_JSON for the configured project') from None
+
+
 def initialize():
-    """Use ADC in deployment and anonymous credentials only for demo emulators."""
+    """Use server credentials in cloud mode and anonymous demo emulator access."""
     global _configuration
     current = configuration()
     with _lock:
@@ -89,7 +109,7 @@ def initialize():
         try:
             app = firebase_admin.get_app()
         except ValueError:
-            credential = _EmulatorCredential() if auth_host else credentials.ApplicationDefault()
+            credential = _EmulatorCredential() if auth_host else _cloud_credential(project)
             app = firebase_admin.initialize_app(credential, {'projectId': project})
         if app.project_id != project:
             raise FirebaseConfigurationError('The initialized Firebase app belongs to another project')

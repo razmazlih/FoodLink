@@ -1,0 +1,196 @@
+# Existing FoodLink services; all backend compute stays on the Free plan.
+previews:
+  generation: "off"
+services:
+  - name: UserBase
+    type: web
+    runtime: docker
+    plan: free
+    region: frankfurt
+    repo: https://github.com/razmazlih/FoodLink
+    branch: main
+    autoDeployTrigger: commit
+    dockerfilePath: ./infrastructure/Dockerfile.firebase
+    dockerContext: .
+    dockerCommand: /bin/sh -c "exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 user_base.wsgi:application"
+    healthCheckPath: /healthz
+    buildFilter:
+      paths:
+        - UserBase/**
+        - foodlink_core/**
+        - infrastructure/Dockerfile.firebase
+        - .dockerignore
+      ignoredPaths:
+        - "**/*.md"
+        - "**/tests/**"
+        - "**/*tests.py"
+        - "**/test_*.py"
+    envVars:
+      - key: SERVICE
+        value: UserBase
+      - key: FIREBASE_PROJECT_ID
+        value: foodlink-razmaz
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://foodlink-front.onrender.com,https://manager-front.onrender.com
+      - key: DJANGO_SETTINGS_MODULE
+        value: user_base.firebase_settings
+      - key: ALLOWED_HOSTS
+        value: userbase-xqd2.onrender.com
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+  - name: DishBoard
+    type: web
+    runtime: docker
+    plan: free
+    region: frankfurt
+    repo: https://github.com/razmazlih/FoodLink
+    branch: main
+    autoDeployTrigger: commit
+    dockerfilePath: ./infrastructure/Dockerfile.firebase
+    dockerContext: .
+    dockerCommand: /bin/sh -c "exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 dish_board.wsgi:application"
+    healthCheckPath: /healthz
+    buildFilter:
+      paths:
+        - DishBoard/**
+        - foodlink_core/**
+        - infrastructure/Dockerfile.firebase
+        - .dockerignore
+      ignoredPaths:
+        - "**/*.md"
+        - "**/tests/**"
+        - "**/*tests.py"
+        - "**/test_*.py"
+    envVars:
+      - key: SERVICE
+        value: DishBoard
+      - key: FIREBASE_PROJECT_ID
+        value: foodlink-razmaz
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://foodlink-front.onrender.com,https://manager-front.onrender.com
+      - key: DJANGO_SETTINGS_MODULE
+        value: dish_board.firebase_settings
+      - key: ALLOWED_HOSTS
+        value: dishboard.onrender.com
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+  - name: OrderLine
+    type: web
+    runtime: docker
+    plan: free
+    region: frankfurt
+    repo: https://github.com/razmazlih/FoodLink
+    branch: main
+    autoDeployTrigger: commit
+    dockerfilePath: ./infrastructure/Dockerfile.firebase
+    dockerContext: .
+    dockerCommand: /bin/sh -c "exec uvicorn firebase_main:app --host 0.0.0.0 --port $PORT --workers 1"
+    healthCheckPath: /healthz
+    buildFilter:
+      paths:
+        - OrderLine/**
+        - foodlink_core/**
+        - infrastructure/Dockerfile.firebase
+        - .dockerignore
+      ignoredPaths:
+        - "**/*.md"
+        - "**/tests/**"
+        - "**/*tests.py"
+        - "**/test_*.py"
+    envVars:
+      - key: SERVICE
+        value: OrderLine
+      - key: FIREBASE_PROJECT_ID
+        value: foodlink-razmaz
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://foodlink-front.onrender.com,https://manager-front.onrender.com
+  - name: FoodLink-front
+    type: web
+    runtime: static
+    repo: https://github.com/razmazlih/FoodLink
+    branch: main
+    rootDir: frontend
+    autoDeployTrigger: commit
+    buildCommand: npm ci --no-audit --no-fund && npm run build
+    staticPublishPath: build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    buildFilter:
+      paths:
+        - frontend/**
+      ignoredPaths:
+        - "**/*.md"
+        - "**/*.test.js"
+        - "**/*.test.jsx"
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: REACT_APP_FIREBASE_PROJECT_ID
+        value: foodlink-razmaz
+      - key: REACT_APP_FIREBASE_AUTH_DOMAIN
+        value: foodlink-razmaz.firebaseapp.com
+      - key: REACT_APP_USE_FIREBASE_EMULATORS
+        value: "false"
+      - key: REACT_APP_FIREBASE_API_KEY
+        sync: false
+      - key: REACT_APP_FIREBASE_APP_ID
+        sync: false
+      - key: REACT_APP_API_USERBASE_URL
+        value: https://userbase-xqd2.onrender.com/api
+      - key: REACT_APP_API_DISHBOARD_URL
+        value: https://dishboard.onrender.com/api
+      - key: REACT_APP_API_ORDERLINE_URL
+        value: https://orderline.onrender.com
+      - key: REACT_APP_WEBSOCKET_ORDERLINE_URL
+        value: wss://orderline.onrender.com
+  - name: manager-front
+    type: web
+    runtime: static
+    repo: https://github.com/razmazlih/FoodLink
+    branch: main
+    rootDir: manager-front
+    autoDeployTrigger: commit
+    buildCommand: npm ci --no-audit --no-fund && npm run build
+    staticPublishPath: build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    buildFilter:
+      paths:
+        - manager-front/**
+      ignoredPaths:
+        - "**/*.md"
+        - "**/*.test.js"
+        - "**/*.test.jsx"
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: REACT_APP_FIREBASE_PROJECT_ID
+        value: foodlink-razmaz
+      - key: REACT_APP_FIREBASE_AUTH_DOMAIN
+        value: foodlink-razmaz.firebaseapp.com
+      - key: REACT_APP_USE_FIREBASE_EMULATORS
+        value: "false"
+      - key: REACT_APP_FIREBASE_API_KEY
+        sync: false
+      - key: REACT_APP_FIREBASE_APP_ID
+        sync: false
+      - key: REACT_APP_USER_BASE_URL
+        value: https://userbase-xqd2.onrender.com/api
+      - key: REACT_APP_DISH_BOARD_URL
+        value: https://dishboard.onrender.com/api
+      - key: REACT_APP_ORDER_LINE_URL
+        value: https://orderline.onrender.com

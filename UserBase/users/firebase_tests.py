@@ -9,6 +9,13 @@ from users import firebase_views as views
 
 
 class FirebaseAccountTests(SimpleTestCase):
+    @patch('foodlink_core.firebase.initialize', side_effect=AssertionError('Health must not initialize Firebase'))
+    def test_health_is_public_and_independent_of_firebase(self, initialize):
+        response = APIClient().get('/healthz', HTTP_AUTHORIZATION='Bearer invalid')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'status': 'ok', 'service': 'userbase'})
+        initialize.assert_not_called()
+
     def setUp(self):
         self.client = APIClient()
         self.customer = Identity('uid-customer', 'customer@example.com', 'customer', {})

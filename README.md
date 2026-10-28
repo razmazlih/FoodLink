@@ -1,5 +1,7 @@
 # FoodLink
 
+Render hosting and per-service automatic build filters: [deployment guide](docs/render.md).
+
 FoodLink now uses **Cloud Firestore and Firebase Authentication**. The selected
 Firebase project is `foodlink-razmaz`, with a Standard Native Firestore database
 in Tel Aviv (`me-west1`). No old data migration is required.

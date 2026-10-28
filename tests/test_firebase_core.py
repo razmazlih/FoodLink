@@ -1,5 +1,6 @@
 """Shared Firebase contracts; isolated mocks never contact a project."""
 import importlib
+import json
 import os
 from pathlib import Path
 import sys
@@ -19,6 +20,62 @@ EMULATORS = {
 
 
 class FirebaseConfigurationTests(unittest.TestCase):
+    def test_cloud_initialization_uses_service_account_secret(self):
+        account = {'type': 'service_account', 'project_id': 'foodlink-razmaz', 'private_key': 'mock-secret'}
+        app, certificate = MagicMock(project_id='foodlink-razmaz'), object()
+        with patch.dict(os.environ, {**PRODUCTION, 'FIREBASE_SERVICE_ACCOUNT_JSON': json.dumps(account)}, clear=True), \
+                patch.object(firebase, '_configuration', None), \
+                patch.object(firebase.firebase_admin, 'get_app', side_effect=ValueError), \
+                patch.object(firebase.firebase_admin, 'initialize_app', return_value=app) as initialize, \
+                patch.object(firebase.credentials, 'Certificate', return_value=certificate) as create_certificate, \
+                patch.object(firebase.credentials, 'ApplicationDefault') as adc:
+            self.assertIs(firebase.initialize(), app)
+            create_certificate.assert_called_once_with(account)
+            initialize.assert_called_once_with(certificate, {'projectId': 'foodlink-razmaz'})
+            adc.assert_not_called()
+
+    def test_cloud_without_service_account_secret_retains_adc(self):
+        with patch.dict(os.environ, PRODUCTION, clear=True), \
+                patch.object(firebase.credentials, 'ApplicationDefault') as adc, \
+                patch.object(firebase.credentials, 'Certificate') as certificate:
+            self.assertIs(firebase._cloud_credential('foodlink-razmaz'), adc.return_value)
+            adc.assert_called_once_with()
+            certificate.assert_not_called()
+
+    def test_invalid_service_account_secrets_fail_without_exposing_contents(self):
+        secrets = ['secret-not-json', '[]', 'null',
+                   json.dumps({'type': 'authorized_user', 'project_id': 'foodlink-razmaz'}),
+                   json.dumps({'type': 'service_account', 'project_id': 'another-project'})]
+        for secret in secrets:
+            with self.subTest(secret=secret), \
+                    patch.dict(os.environ, {**PRODUCTION, 'FIREBASE_SERVICE_ACCOUNT_JSON': secret}, clear=True), \
+                    patch.object(firebase.credentials, 'Certificate') as certificate, \
+                    patch.object(firebase.credentials, 'ApplicationDefault') as adc:
+                with self.assertRaises(firebase.FirebaseConfigurationError) as error:
+                    firebase._cloud_credential('foodlink-razmaz')
+                self.assertEqual(str(error.exception), 'Invalid FIREBASE_SERVICE_ACCOUNT_JSON for the configured project')
+                self.assertIsNone(error.exception.__cause__)
+                certificate.assert_not_called()
+                adc.assert_not_called()
+
+    def test_service_account_sdk_error_is_sanitized(self):
+        account = {'type': 'service_account', 'project_id': 'foodlink-razmaz'}
+        with patch.dict(os.environ, {**PRODUCTION, 'FIREBASE_SERVICE_ACCOUNT_JSON': json.dumps(account)}, clear=True), \
+                patch.object(firebase.credentials, 'Certificate', side_effect=ValueError('private credential diagnostic')):
+            with self.assertRaises(firebase.FirebaseConfigurationError) as error:
+                firebase._cloud_credential('foodlink-razmaz')
+            self.assertEqual(str(error.exception), 'Invalid FIREBASE_SERVICE_ACCOUNT_JSON for the configured project')
+            self.assertTrue(error.exception.__suppress_context__)
+
+    def test_emulators_reject_cloud_service_account_secret(self):
+        with patch.dict(os.environ, {**EMULATORS, 'FIREBASE_SERVICE_ACCOUNT_JSON': 'secret'}, clear=True), \
+                patch.object(firebase.firebase_admin, 'get_app') as get_app, \
+                patch.object(firebase.credentials, 'Certificate') as certificate:
+            with self.assertRaisesRegex(firebase.FirebaseConfigurationError, 'Remove FIREBASE_SERVICE_ACCOUNT_JSON'):
+                firebase.initialize()
+            get_app.assert_not_called()
+            certificate.assert_not_called()
+
     def test_project_must_be_explicit(self):
         with patch.dict(os.environ, {}, clear=True):
             with self.assertRaises(firebase.FirebaseConfigurationError):
