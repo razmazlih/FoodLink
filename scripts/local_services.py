@@ -29,13 +29,33 @@ def process_identity(pid):
     """Read identity from the OS, including creation time and full command."""
     if type(pid) is not int or pid <= 1:
         return None
-    result = subprocess.run(['ps', '-p', str(pid), '-o', 'pgid=', '-o', 'lstart=', '-o', 'command='],
-                            capture_output=True, text=True, check=False)
+
+    result = subprocess.run(
+        [
+            'ps',
+            '-p', str(pid),
+            '-o', 'pgid=',
+            '-o', 'lstart=',
+            '-o', 'command='
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, 'LC_ALL': 'C'}
+    )
+
     fields = result.stdout.strip().split(None, 6)
+
     if result.returncode or len(fields) < 7:
         return None
+
     try:
-        return {'pid': pid, 'pgid': int(fields[0]), 'started': ' '.join(fields[1:6]), 'command': fields[6]}
+        return {
+            'pid': pid,
+            'pgid': int(fields[0]),
+            'started': ' '.join(fields[1:6]),
+            'command': fields[6]
+        }
     except ValueError:
         return None
 
