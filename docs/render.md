@@ -63,3 +63,27 @@ request after sleep can take about a minute.
 
 When connecting the Blueprint, select the existing services rather than creating
 duplicate services with suffixed names. Their URLs should remain unchanged.
+
+## Deployment verification — 2026-10-28
+
+All five existing services were associated with the FoodLink Blueprint and
+deployed successfully. The APIs run commit `6bb1750`; both static sites run
+`77cab26`, because the later backend-only fix correctly skipped their builds.
+The live service configuration was checked for the intended repository, branch,
+root directories, Free compute plans, and build filters.
+
+Verified against the public URLs:
+
+- All three `/healthz` endpoints return HTTP 200.
+- Customer and manager Firebase password sign-in, including browser login.
+- Customer profile and order listing, public restaurant data, and CORS.
+- Manager dashboard and restaurant listing; customers cannot access admin stats.
+- A temporary empty draft changed to cancelled in the open customer order page
+  without a reload, verifying the browser's live update path.
+- The two Render frontend domains are authorized in Firebase Authentication.
+
+Dedicated API identities have Firestore and Auth read access. Only UserBase's
+identity has Auth administration access. Secrets are stored in Render and were
+not committed. Temporary acceptance accounts, profiles, draft, and status were
+removed after verification. Real payment processing and real image uploads were
+not exercised.
