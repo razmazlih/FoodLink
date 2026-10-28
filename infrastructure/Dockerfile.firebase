@@ -5,6 +5,9 @@ COPY ${SERVICE}/requirements.firebase.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 COPY foodlink_core /app/foodlink_core
 COPY ${SERVICE} /app/service
+COPY infrastructure/start_firebase.py /app/start_firebase.py
 ENV PYTHONPATH=/app
+ENV SERVICE=${SERVICE}
 WORKDIR /app/service
 EXPOSE 8000
+CMD ["python", "/app/start_firebase.py"]

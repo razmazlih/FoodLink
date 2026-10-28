@@ -12,13 +12,14 @@ services:
     autoDeployTrigger: commit
     dockerfilePath: ./infrastructure/Dockerfile.firebase
     dockerContext: .
-    dockerCommand: /bin/sh -c "exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 user_base.wsgi:application"
+    dockerCommand: ""
     healthCheckPath: /healthz
     buildFilter:
       paths:
         - UserBase/**
         - foodlink_core/**
         - infrastructure/Dockerfile.firebase
+        - infrastructure/start_firebase.py
         - .dockerignore
       ignoredPaths:
         - "**/*.md"
@@ -50,13 +51,14 @@ services:
     autoDeployTrigger: commit
     dockerfilePath: ./infrastructure/Dockerfile.firebase
     dockerContext: .
-    dockerCommand: /bin/sh -c "exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 dish_board.wsgi:application"
+    dockerCommand: ""
     healthCheckPath: /healthz
     buildFilter:
       paths:
         - DishBoard/**
         - foodlink_core/**
         - infrastructure/Dockerfile.firebase
+        - infrastructure/start_firebase.py
         - .dockerignore
       ignoredPaths:
         - "**/*.md"
@@ -88,13 +90,14 @@ services:
     autoDeployTrigger: commit
     dockerfilePath: ./infrastructure/Dockerfile.firebase
     dockerContext: .
-    dockerCommand: /bin/sh -c "exec uvicorn firebase_main:app --host 0.0.0.0 --port $PORT --workers 1"
+    dockerCommand: ""
     healthCheckPath: /healthz
     buildFilter:
       paths:
         - OrderLine/**
         - foodlink_core/**
         - infrastructure/Dockerfile.firebase
+        - infrastructure/start_firebase.py
         - .dockerignore
       ignoredPaths:
         - "**/*.md"

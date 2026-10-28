@@ -14,7 +14,7 @@ paid compute, keep-alive job, or preview environment.
 | `UserBase/**` | UserBase |
 | `DishBoard/**` | DishBoard |
 | `OrderLine/**` | OrderLine |
-| `foodlink_core/**`, `infrastructure/Dockerfile.firebase`, `.dockerignore` | All three APIs |
+| `foodlink_core/**`, shared Firebase Dockerfile/start script, `.dockerignore` | All three APIs |
 | Documentation, test-only changes, catalog import data, local launcher | None |
 
 Filters include dependency manifests and lockfiles. Frontend root directories
@@ -49,6 +49,9 @@ request after sleep can take about a minute.
 - `/healthz` verifies that each HTTP process responds, without database reads.
   Verify a restaurant read and an authenticated profile request separately.
 - OrderLine runs one worker because its WebSocket subscriptions are in memory.
+- Docker's default command runs `infrastructure/start_firebase.py`, which
+  replaces itself with the selected server process and passes `PORT` directly
+  as an argument. Keep Render's Docker command override empty.
 
 ## Existing service URLs
 
