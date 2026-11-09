@@ -8,6 +8,12 @@ A full-stack project that connects a React customer experience with three Python
 
 **Demo scope:** The public site supports restaurant discovery and reference-menu browsing. Its listed restaurants are not connected to FoodLink ordering, so their order buttons are intentionally disabled. Use the local Firebase emulator fixtures below to explore the customer-to-manager order flow. Render's free APIs may take about a minute to wake up.
 
+## 40-second project demo
+
+**[Watch the walkthrough](docs/demos/recruiter-walkthrough.mp4)** · [Demo scope and evidence](docs/demos/README.md)
+
+Actual public-site captures of the reference catalog. Restaurants are not connected ordering partners; no live order or payment is demonstrated.
+
 ## See the experience
 
 ### 1. Start with the customer website
