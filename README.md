@@ -73,6 +73,7 @@ Use the **local Firebase emulators** for a repeatable demonstration with disposa
 
 No production demo credentials are published. The manager's live workspace requires an authorized account.
 
+- [Reproducible checks, CI, and first-time demo setup](docs/testing.md)
 - [Firebase setup, authorization, and test commands](docs/firebase.md)
 - [API contracts](docs/contracts.md)
 - [Render deployment and service-specific build filters](docs/render.md)

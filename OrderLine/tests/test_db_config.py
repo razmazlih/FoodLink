@@ -76,8 +76,15 @@ with patch('init_db.init_db') as initialize:
 import runpy
 from unittest.mock import patch
 from models.base import Base
-with patch.object(Base.metadata, 'create_all') as create:
+# Exercise schema creation against TEST_DATABASE's isolated SQLite engine.
+# A no-op mock leaves no orders table for the additive migration to inspect.
+with patch.object(Base.metadata, 'create_all', wraps=Base.metadata.create_all) as create:
     runpy.run_module('init_db', run_name='__main__')
     create.assert_called_once()
     assert set(Base.metadata.tables) == {'orders', 'order_item', 'order_status'}
+    from sqlalchemy import inspect
+    from database import engine
+    assert 'delivery_address' in {column['name'] for column in inspect(engine).get_columns('orders')}
+    runpy.run_module('init_db', run_name='__main__')
+    assert create.call_count == 2
 ''', AUTO_INIT_DB='false')
