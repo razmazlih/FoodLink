@@ -10,7 +10,7 @@ A full-stack project that connects a React customer experience with three Python
 
 ## 40-second project demo
 
-**[Watch the walkthrough](docs/demos/recruiter-walkthrough.mp4)** · [Demo scope and evidence](docs/demos/README.md)
+**[Watch the walkthrough](https://foodlink-front.onrender.com/demo.html)** · [Demo scope and evidence](docs/demos/README.md)
 
 Actual public-site captures of the reference catalog. Restaurants are not connected ordering partners; no live order or payment is demonstrated.
 
